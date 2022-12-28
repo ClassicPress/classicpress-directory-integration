@@ -42,8 +42,12 @@ class Update {
 		// Add a test menu. ToDo: remove
 		add_action('admin_menu', [$this, 'create_test_menu'], 100);
 
+		// Hook to check for updates
 		$update_plugins_hook = 'update_plugins_'.wp_parse_url(\CLASSICPRESS_DIRECTORY_INTEGRATION_URL, PHP_URL_HOST);
 		add_filter($update_plugins_hook, [$this, 'update_uri_filter'], 10, 4);
+
+		// Hooks to refresh directory data
+			add_action('activated_plugin', [$this, 'refresh_cp_directory_data']);
 
 		// Register hooks for activation, deactivation, and uninstallation.
 		register_uninstall_hook(__FILE__,    [__CLASS__, 'uninstall_plugin']);
@@ -51,6 +55,11 @@ class Update {
 		register_deactivation_hook(__FILE__, [$this, 'deactivate_plugin']);
 
 
+	}
+
+	// Force a refresh of local ClassicPress directory data
+	public function refresh_cp_directory_data() {
+		$this->get_directory_data(true);
 	}
 
 	// Add a test menu. ToDo: remove
@@ -215,42 +224,34 @@ class Update {
 			'version'      => $data['Version'],
 			'package'      => $data['Download'],
 			'requires_php' => $data['RequiresPHP'],
+
 		];
 
 		return $update;
+
 	}
 
 	public function activate_plugin() {
-
 		// No permission to activate plugins? Bail.
 		if (!current_user_can('activate_plugins')) {
 			return;
 		}
-
 		// Refresh data from directory
-		get_directory_data(true);
-
+		$this->refresh_cp_directory_data();
 	}
 
 	public function deactivate_plugin() {
-
 		// No permission to activate plugins? None to deactivate either. Bail.
 		if (!current_user_can('activate_plugins')) {
 			return;
 		}
-
-
 	}
 
 	public static function uninstall_plugin() {
-
 		// No permission to delete plugins? Bail.
 		if (!current_user_can('delete_plugins')) {
 			return;
 		}
-
-		// Delete options related to the plugin.
-
 	}
 
 }
