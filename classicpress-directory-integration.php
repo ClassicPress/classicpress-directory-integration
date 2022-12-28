@@ -51,7 +51,6 @@ class Update {
 		add_filter('plugin_row_meta', [$this, 'plugin_row_meta'], 100, 2);
 		add_filter('after_plugin_row', [$this, 'after_plugin_row'], 100, 3);
 
-
 		// Hooks to refresh directory data
 		add_action('activated_plugin', [$this, 'refresh_cp_directory_data']);
 
@@ -60,7 +59,6 @@ class Update {
 		register_activation_hook(__FILE__,   [$this, 'activate_plugin']);
 		register_deactivation_hook(__FILE__, [$this, 'deactivate_plugin']);
 
-
 	}
 
 	public function plugin_row_meta($links, $file) {
@@ -68,14 +66,14 @@ class Update {
 		$slug    = dirname($file);
 		$plugins = $this->get_cp_plugins();
 
-		if(!array_key_exists($slug, $plugins)) {
+		if (!array_key_exists($slug, $plugins)) {
 			return $links;
 		}
 
 		// Remove View details and replace with Visit site
-		foreach ($links as $key => $value){
+		foreach ($links as $key => $value) {
 			if (strpos($value, 'open-plugin-details-modal') !== false) {
-				$links[$key]='<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>';
+				$links[$key] = '<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>';
 			}
 		}
 
@@ -88,7 +86,7 @@ class Update {
 		$slug     = dirname($plugin_file);
 		$plugins  = $this->get_cp_plugins();
 
-		if(!array_key_exists($slug, $plugins)) {
+		if (!array_key_exists($slug, $plugins)) {
 			return;
 		}
 
@@ -101,7 +99,7 @@ class Update {
 			return false;
 		}
 
-		$message='';
+		$message = '';
 		if (version_compare(classicpress_version(), $data['RequiresCP']) === -1) {
 			// Higher CP version required
 			// Translators: %1$s is the plugin latest version. %2$s is the ClassicPress version required by the plugin.
@@ -115,11 +113,11 @@ class Update {
 			$message .= sprintf (esc_html__('This plugin has not updated to version %1$s because it needs PHP %2$s.', 'classicpress-directory-integration'), esc_html($data['Version']), esc_html($data['RequiresPHP']));
 		}
 
-		if($message === '') {
+		if ($message === '') {
 			return;
 		}
 
-		echo '<tr class="plugin-update-tr active" id="'.esc_html($plugin_file).'-update" data-slug="'.esc_html($plugin_file)." data-plugin=".esc_html($plugin_file).'"><td colspan="3" class="plugin-update colspanchange"><div class="update-message notice inline notice-alt notice-error"><p aria-label="Can not install a newer version.">';
+		echo '<tr class="plugin-update-tr active" id="'.esc_html($plugin_file).'-update" data-slug="'.esc_html($plugin_file).'" data-plugin="'.esc_html($plugin_file).'"><td colspan="3" class="plugin-update colspanchange"><div class="update-message notice inline notice-alt notice-error"><p aria-label="Can not install a newer version.">';
 		echo esc_html($message).'</p></div></td></tr>';
 		//echo $output;
 
@@ -149,18 +147,12 @@ class Update {
 		echo '<h1>Welcome to the sandbox</h1>';
 		echo '<pre>';
 		// PLAY THERE
-		delete_transient('cpdi_directory_data');
-		$x=$this->get_directory_data();
+		// delete_transient('cpdi_directory_data');
+		$x = $this->get_directory_data();
 		var_dump($x);
-		$y=$this->get_cp_plugins();
+		$y = $this->get_cp_plugins();
 		var_dump($y);
-		// version_compare($plugin['Version'], $data['Version']) >= 0)
-		echo phpversion();
-		$z=version_compare(phpversion(), '7.0.14');
-		var_dump($z);
 		// END OF GAMES
-
-		echo classicpress_version();
 		echo '</pre>';
 	}
 
@@ -174,7 +166,7 @@ class Update {
 		$all_plugins = get_plugins();
 		$cp_plugins  = [];
 		foreach ($all_plugins as $slug => $plugin) {
-			if (!array_key_exists('UpdateURI',$plugin)) {
+			if (!array_key_exists('UpdateURI', $plugin)) {
 				continue;
 			}
 			if (strpos($plugin['UpdateURI'], \CLASSICPRESS_DIRECTORY_INTEGRATION_URL) !== 0) {
@@ -183,9 +175,9 @@ class Update {
 			$cp_plugins[dirname($slug)] = [
 				'WPSlug'      => $slug,
 				'Version'     => $plugin['Version'],
-				'RequiresPHP' => array_key_exists('RequiresPHP',$plugin) ? $plugin['RequiresPHP'] : null,
-				'RequiresCP'  => array_key_exists('RequiresCP',$plugin) ? $plugin['RequiresCP'] : null,
-				'PluginURI'   => array_key_exists('PluginURI',$plugin) ? $plugin['PluginURI'] : null,
+				'RequiresPHP' => array_key_exists('RequiresPHP', $plugin) ? $plugin['RequiresPHP'] : null,
+				'RequiresCP'  => array_key_exists('RequiresCP', $plugin) ? $plugin['RequiresCP'] : null,
+				'PluginURI'   => array_key_exists('PluginURI', $plugin) ? $plugin['PluginURI'] : null,
 			];
 		}
 
