@@ -33,7 +33,3 @@ read -n 1 -s -r -p "If OK, press any key to continue (CTRL-C to exit)."
 echo
 
 git archive -o "bin/${slug}-${version}.zip" --prefix ${slug}/ HEAD
-
-hub release create -d -a "../${slug}-${version}.zip" -m "${name} ${version}" "${version}"
-
-rm -fr "../${slug}-${version}.zip"
