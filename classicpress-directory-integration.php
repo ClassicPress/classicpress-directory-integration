@@ -119,7 +119,6 @@ class Update {
 
 		echo '<tr class="plugin-update-tr active" id="'.esc_html($plugin_file).'-update" data-slug="'.esc_html($plugin_file).'" data-plugin="'.esc_html($plugin_file).'"><td colspan="3" class="plugin-update colspanchange"><div class="update-message notice inline notice-alt notice-error"><p aria-label="Can not install a newer version.">';
 		echo esc_html($message).'</p></div></td></tr>';
-		//echo $output;
 
 	}
 
