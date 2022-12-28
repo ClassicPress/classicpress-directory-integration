@@ -146,7 +146,7 @@ class Update {
 		echo '<h1>Welcome to the sandbox</h1>';
 		echo '<pre>';
 		// PLAY THERE
-		// delete_transient('cpdi_directory_data');
+		delete_transient('cpdi_directory_data');
 		$x = $this->get_directory_data();
 		var_dump($x);
 		$y = $this->get_cp_plugins();
@@ -201,7 +201,7 @@ class Update {
 
 		// Query the directory
 		$plugins  = $this->get_cp_plugins();
-		$endpoint = \CLASSICPRESS_DIRECTORY_INTEGRATION_URL.'plugins?byslug='.implode(',', array_keys($plugins));
+		$endpoint = \CLASSICPRESS_DIRECTORY_INTEGRATION_URL.'plugins?byslug='.implode(',', array_keys($plugins)).'&_fields=meta';
 		$response = wp_remote_get($endpoint, ['user-agent' => classicpress_user_agent(true)]);
 
 		if (is_wp_error($response) || empty($response['response']) || $response['response']['code'] != '200') {
