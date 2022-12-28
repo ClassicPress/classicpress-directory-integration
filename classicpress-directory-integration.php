@@ -32,6 +32,7 @@ if (!defined('ABSPATH')) {
 class Update {
 
 	private $cp_directory_data = false;
+	private $cp_plugins = false;
 
 	public function __construct() {
 
@@ -46,14 +47,81 @@ class Update {
 		$update_plugins_hook = 'update_plugins_'.wp_parse_url(\CLASSICPRESS_DIRECTORY_INTEGRATION_URL, PHP_URL_HOST);
 		add_filter($update_plugins_hook, [$this, 'update_uri_filter'], 10, 4);
 
+		// Deal with row meta
+		add_filter('plugin_row_meta', [$this, 'plugin_row_meta'], 100, 2);
+		add_filter('after_plugin_row', [$this, 'after_plugin_row'], 100, 3);
+
+
 		// Hooks to refresh directory data
-			add_action('activated_plugin', [$this, 'refresh_cp_directory_data']);
+		add_action('activated_plugin', [$this, 'refresh_cp_directory_data']);
 
 		// Register hooks for activation, deactivation, and uninstallation.
 		register_uninstall_hook(__FILE__,    [__CLASS__, 'uninstall_plugin']);
 		register_activation_hook(__FILE__,   [$this, 'activate_plugin']);
 		register_deactivation_hook(__FILE__, [$this, 'deactivate_plugin']);
 
+
+	}
+
+	public function plugin_row_meta($links, $file) {
+
+		$slug    = dirname($file);
+		$plugins = $this->get_cp_plugins();
+
+		if(!array_key_exists($slug, $plugins)) {
+			return $links;
+		}
+
+		// Remove View details and replace with Visit site
+		foreach ($links as $key => $value){
+			if (strpos($value, 'open-plugin-details-modal') !== false) {
+				$links[$key]='<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>';
+			}
+		}
+
+		return $links;
+
+	}
+
+	public function after_plugin_row($plugin_file, $plugin_data, $status) {
+
+		$slug     = dirname($plugin_file);
+		$plugins  = $this->get_cp_plugins();
+
+		if(!array_key_exists($slug, $plugins)) {
+			return;
+		}
+
+		$dir_data = $this->get_directory_data();
+		$data     = $dir_data[$slug];
+		$plugin   = $plugins[$slug];
+
+		if (version_compare($plugin['Version'], $data['Version']) >= 0) {
+			// No updates available
+			return false;
+		}
+
+		$message='';
+		if (version_compare(classicpress_version(), $data['RequiresCP']) === -1) {
+			// Higher CP version required
+			// Translators: %1$s is the plugin latest version. %2$s is the ClassicPress version required by the plugin.
+			$message .= sprintf (esc_html__('This plugin has not updated to version %1$s because it needs ClassicPress %2$s.', 'classicpress-directory-integration'), esc_html($data['Version']), esc_html($data['RequiresCP']));
+		}
+		if (version_compare(phpversion(), $data['RequiresPHP']) === -1) {
+			if ($message !== '') {
+				$message .= ' ';
+			}
+			// Translators: %1$s is the plugin latest version. %2$s is the PHP version required by the plugin.
+			$message .= sprintf (esc_html__('This plugin has not updated to version %1$s because it needs PHP %2$s.', 'classicpress-directory-integration'), esc_html($data['Version']), esc_html($data['RequiresPHP']));
+		}
+
+		if($message === '') {
+			return;
+		}
+
+		echo '<tr class="plugin-update-tr active" id="'.esc_html($plugin_file).'-update" data-slug="'.esc_html($plugin_file)." data-plugin=".esc_html($plugin_file).'"><td colspan="3" class="plugin-update colspanchange"><div class="update-message notice inline notice-alt notice-error"><p aria-label="Can not install a newer version.">';
+		echo esc_html($message).'</p></div></td></tr>';
+		//echo $output;
 
 	}
 
@@ -81,20 +149,28 @@ class Update {
 		echo '<h1>Welcome to the sandbox</h1>';
 		echo '<pre>';
 		// PLAY THERE
+		delete_transient('cpdi_directory_data');
 		$x=$this->get_directory_data();
 		var_dump($x);
 		$y=$this->get_cp_plugins();
 		var_dump($y);
 		// version_compare($plugin['Version'], $data['Version']) >= 0)
-		$z=version_compare('1.2.0', '1.5');
+		echo phpversion();
+		$z=version_compare(phpversion(), '7.0.14');
 		var_dump($z);
-		echo wp_parse_url(\CLASSICPRESS_DIRECTORY_INTEGRATION_URL, PHP_URL_HOST);
 		// END OF GAMES
+
+		echo classicpress_version();
 		echo '</pre>';
 	}
 
 	// Get all installed ClassicPress plugin
 	private function get_cp_plugins() {
+
+		if ($this->cp_plugins !== false) {
+			return $this->cp_plugins;
+		}
+
 		$all_plugins = get_plugins();
 		$cp_plugins  = [];
 		foreach ($all_plugins as $slug => $plugin) {
@@ -109,9 +185,13 @@ class Update {
 				'Version'     => $plugin['Version'],
 				'RequiresPHP' => array_key_exists('RequiresPHP',$plugin) ? $plugin['RequiresPHP'] : null,
 				'RequiresCP'  => array_key_exists('RequiresCP',$plugin) ? $plugin['RequiresCP'] : null,
+				'PluginURI'   => array_key_exists('PluginURI',$plugin) ? $plugin['PluginURI'] : null,
 			];
 		}
-		return $cp_plugins;
+
+		$this->cp_plugins = $cp_plugins;
+		return $this->cp_plugins;
+
 	}
 
 	// Get data from the directory for all installed ClassicPress plugin
@@ -158,35 +238,7 @@ class Update {
 	// Filter to trigger updates using Update URI header
 	public function update_uri_filter($update, $plugin_data, $plugin_file, $locales) {
 
-		// codepotent_php_error_log_viewer_log($plugin_data);
-		/*
-		Array
-			(
-				[Name] => ClassicPress Directory Integration
-				[PluginURI] => https://www.classicpress.net
-				[Version] => 0.1.0
-				[Description] => Desc.
-				[Author] => ClassicPress Contributors
-				[AuthorURI] => https://www.classicpress.net
-				[TextDomain] => classicpress-directory-integration
-				[DomainPath] => /languages
-				[Network] =>
-				[RequiresWP] =>
-				[RequiresCP] => 1.5
-				[RequiresPHP] => 5.6
-				[UpdateURI] => https://directory.classicpress.net/wp-json/wp/v2/plugins?byslug=classicpress-directory-integration
-				[Title] => ClassicPress Directory Integration
-				[AuthorName] => ClassicPress Contributors
-			)
-		*/
-		// codepotent_php_error_log_viewer_log($plugin_file);
-		/*
-		classicpress-directory-integration/classicpress-directory-integration.php
-		*/
-
-
 		// https://developer.wordpress.org/reference/hooks/update_plugins_hostname/
-
 
 		// Get the slug from Update URI
 		if (preg_match('/plugins\?byslug=(.*)/', $plugin_data['UpdateURI'], $matches) !== 1) {
@@ -218,11 +270,19 @@ class Update {
 			// No updates available
 			return false;
 		}
+		if (version_compare(classicpress_version(), $data['RequiresCP']) === -1) {
+			// Higher CP version required
+			return false;
+		}
+		if (version_compare(phpversion(), $data['RequiresPHP']) === -1) {
+			// Higher PHP version required
+			return false;
+		}
 
 		$update = [
 			'slug'         => $plugin_file,
 			'version'      => $data['Version'],
-			'package'      => $data['Download'],
+			'package'      => $data['Download'].'xxx',
 			'requires_php' => $data['RequiresPHP'],
 
 		];
