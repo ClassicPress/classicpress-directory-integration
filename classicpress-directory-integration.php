@@ -31,7 +31,7 @@ if (!defined('ABSPATH')) {
 
 class Update {
 
-	private $cp_directory_data = false;
+	private $cp_plugins_directory_data = false;
 	private $cp_plugins = false;
 
 	public function __construct() {
@@ -195,14 +195,14 @@ class Update {
 	private function get_directory_data($force = false) {
 
 		// Try to get stored data
-		if (!$force && $this->cp_directory_data !== false) {
+		if (!$force && $this->cp_plugins_directory_data !== false) {
 			// We have it in memory
-			return $this->cp_directory_data;
+			return $this->cp_plugins_directory_data;
 		}
-		$this->cp_directory_data = get_transient('cpdi_directory_data');
-		if (!$force && $this->cp_directory_data !== false) {
+		$this->cp_plugins_directory_data = get_transient('cpdi_directory_data');
+		if (!$force && $this->cp_plugins_directory_data !== false) {
 			// We have it in transient
-			return $this->cp_directory_data;
+			return $this->cp_plugins_directory_data;
 		}
 
 		// Query the directory
@@ -226,9 +226,9 @@ class Update {
 			];
 		}
 
-		$this->cp_directory_data = $data;
-		set_transient('cpdi_directory_data', $this->cp_directory_data, 3 * HOUR_IN_SECONDS);
-		return $this->cp_directory_data;
+		$this->cp_plugins_directory_data = $data;
+		set_transient('cpdi_directory_data', $this->cp_plugins_directory_data, 3 * HOUR_IN_SECONDS);
+		return $this->cp_plugins_directory_data;
 
 	}
 
