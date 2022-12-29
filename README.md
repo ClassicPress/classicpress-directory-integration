@@ -3,7 +3,7 @@
 Steps
 - [X] Create plugin update system that pulls from the directory
 - [ ] Create plugin page
-- [ ] Create theme update system that pulls from the directory
+- [ ] Create theme update system that pulls from the directory (may need Changeset 53933)
 - [ ] Create theme page
 
 ## Plugin from the directory now can update as WP.org plugins.
