@@ -137,22 +137,28 @@ class Update {
 			'Directory tests',
 			'manage_options',
 			'classicpress-directory-integration-test',
-			[$this, 'render_test_page']
+			[$this, 'render_test_page'],
+			'dashicons-pets',
 		);
 	}
 
 	// Add a test menu. ToDo: remove
 	public function render_test_page () {
-		echo '<h1>Welcome to the sandbox</h1>';
-		echo '<pre>';
-		// PLAY THERE
+
 		delete_transient('cpdi_directory_data');
-		$x = $this->get_directory_data();
-		var_dump($x);
-		$y = $this->get_cp_plugins();
-		var_dump($y);
-		// END OF GAMES
+
+		echo '<h1>Local CP plugins</h1>';
+		echo '<pre>';
+		$plugins = $this->get_cp_plugins();
+		var_dump($plugins);
 		echo '</pre>';
+
+		echo '<h1>Dir CP plugins</h1>';
+		echo '<pre>';
+		$dir = $this->get_directory_data();
+		var_dump($dir);
+		echo '</pre>';
+
 	}
 
 	// Get all installed ClassicPress plugin
@@ -273,9 +279,8 @@ class Update {
 		$update = [
 			'slug'         => $plugin_file,
 			'version'      => $data['Version'],
-			'package'      => $data['Download'].'xxx',
+			'package'      => $data['Download'],
 			'requires_php' => $data['RequiresPHP'],
-
 		];
 
 		return $update;
