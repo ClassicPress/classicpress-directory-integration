@@ -89,7 +89,7 @@ class Update {
 			'author'            => $data['meta']['developer_name'],
 			'banners'           => $this->get_plugin_images('banner', $slug),
 			'description'       => 'false',
-			'icons'             => $this->get_plugin_images('icons', $slug),
+			'icons'             => $this->get_plugin_images('icon', $slug),
 			'name'              => $data['title']['rendered'],
 			'requires_php'      => $data['meta']['requires_php'],
 			'screenshots'       => $this->get_plugin_images('screenshot', $slug),
@@ -137,7 +137,7 @@ class Update {
 
 	}
 
-	public function get_plugin_images($type, $plugin) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	private function get_plugin_images($type, $plugin) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 		// From Update Manager
 
 		// Initialize.
@@ -244,13 +244,8 @@ class Update {
 			return $links;
 		}
 
-		// Remove View details and replace with Visit site
-		foreach ($links as $key => $value) {
-			if (strpos($value, 'open-plugin-details-modal') === false) {
-				continue;
-			}
-			$links[$key] = '<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>'; // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-		}
+		// Add Visit site
+		array_push($links, '<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>');
 
 		return $links;
 
@@ -457,6 +452,9 @@ class Update {
 			'version'      => $data['Version'],
 			'package'      => $data['Download'],
 			'requires_php' => $data['RequiresPHP'],
+			'banners'      => $this->get_plugin_images('banner', $slug),
+			'icons'        => $this->get_plugin_images('icon', $slug),
+
 		];
 
 		return $update;
