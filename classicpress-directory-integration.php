@@ -72,9 +72,10 @@ class Update {
 
 		// Remove View details and replace with Visit site
 		foreach ($links as $key => $value) {
-			if (strpos($value, 'open-plugin-details-modal') !== false) {
-				$links[$key] = '<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>';
+			if (strpos($value, 'open-plugin-details-modal') === false) {
+				continue;
 			}
+			$links[$key] = '<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>';
 		}
 
 		return $links;
@@ -138,7 +139,7 @@ class Update {
 			'manage_options',
 			'classicpress-directory-integration-test',
 			[$this, 'render_test_page'],
-			'dashicons-pets',
+			'dashicons-pets'
 		);
 	}
 
@@ -210,7 +211,7 @@ class Update {
 		$endpoint = \CLASSICPRESS_DIRECTORY_INTEGRATION_URL.'plugins?byslug='.implode(',', array_keys($plugins)).'&_fields=meta';
 		$response = wp_remote_get($endpoint, ['user-agent' => classicpress_user_agent(true)]);
 
-		if (is_wp_error($response) || empty($response['response']) || $response['response']['code'] != '200') {
+		if (is_wp_error($response) || empty($response['response']) || wp_remote_retrieve_response_code($response) !== 200) {
 			return false;
 		}
 
