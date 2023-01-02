@@ -249,7 +249,7 @@ class Update {
 			if (strpos($value, 'open-plugin-details-modal') === false) {
 				continue;
 			}
-			$links[$key] = '<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>';
+			$links[$key] = '<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>'; // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 		}
 
 		return $links;
@@ -325,13 +325,13 @@ class Update {
 		echo '<h1>Local CP plugins</h1>';
 		echo '<pre>';
 		$plugins = $this->get_cp_plugins();
-		var_dump($plugins);
+		var_dump($plugins); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_dump
 		echo '</pre>';
 
 		echo '<h1>Dir CP plugins</h1>';
 		echo '<pre>';
 		$dir = $this->get_directory_data();
-		var_dump($dir);
+		var_dump($dir); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_dump
 		echo '</pre>';
 
 	}
