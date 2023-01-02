@@ -50,6 +50,7 @@ class Update {
 		// Deal with row meta
 		add_filter('plugin_row_meta', [$this, 'plugin_row_meta'], 100, 2);
 		add_filter('after_plugin_row', [$this, 'after_plugin_row'], 100, 3);
+		add_filter('plugins_api_result', [$this, 'plugin_information'], 100, 3);
 
 		// Hooks to refresh directory data
 		add_action('activated_plugin', [$this, 'refresh_cp_directory_data']);
@@ -58,6 +59,179 @@ class Update {
 		register_uninstall_hook(__FILE__,    [__CLASS__, 'uninstall_plugin']);
 		register_activation_hook(__FILE__,   [$this, 'activate_plugin']);
 		register_deactivation_hook(__FILE__, [$this, 'deactivate_plugin']);
+
+	}
+
+	public function plugin_information($result, $action, $args) {
+
+		if ($action !== 'plugin_information') {
+			return $result;
+		}
+		$dir_data = $this->get_directory_data(true);
+		$slug = dirname($args->slug);
+		if (!array_key_exists($slug, $dir_data)) {
+			return $result;
+		}
+
+		// Query the directory
+		$endpoint = \CLASSICPRESS_DIRECTORY_INTEGRATION_URL.'plugins?byslug='.$slug;
+		$response = wp_remote_get($endpoint, ['user-agent' => classicpress_user_agent(true)]);
+
+		if (is_wp_error($response) || empty($response['response']) || wp_remote_retrieve_response_code($response) !== 200) {
+			return false;
+		}
+
+		$data_from_dir = json_decode(wp_remote_retrieve_body($response), true);
+		$data = $data_from_dir[0];
+
+		$result = [
+			'active_installs'   => (int) $data['meta']['active_installations'],
+			'author'            => $data['meta']['developer_name'],
+			'banners'           => $this->get_plugin_images('banner', $slug),
+			'description'       => 'false',
+			'icons'             => $this->get_plugin_images('icons', $slug),
+			'name'              => $data['title']['rendered'],
+			'requires_php'      => $data['meta']['requires_php'],
+			'screenshots'       => $this->get_plugin_images('screenshot', $slug),
+			'sections'          => [
+				'desctiption' => $data['content']['rendered'],
+				//'faq'            => 'frequently asked questions',
+				//'installation'   => 'installation',
+				//'screenshots'    => 'screenshots',
+				//'reviews'        => 'reviews',
+				//'other_notes'    => 'other notes',
+				//'changelog'      => 'changelog',
+			],
+			'short_description' => $data['excerpt']['rendered'],
+			'slug'              => null,           // null so we don't point to WP.org
+			'tags'              => explode(',', $data['meta']['category_names']),
+			'version'           => $data['meta']['current_version'],
+			//'added' => true,                     // date
+			//'author_block_count' => true,        // int
+			//'author_block_rating' => true,       // int
+			//'author_profile' => true,            // url
+			//'compatibility' => false,            // empty array?
+			//'contributors' => true,              // array( array( [profile], [avatar], [display_name] )
+			//'donate_link' => true,               // url
+			//'download_link' => true,             // url
+			//'downloaded' => false,               // int
+			//'homepage' => true,                  // url
+			//'last_updated' => true,              // datetime
+			//'num_ratings' => 14,            	   // int how many ratings
+			//'rating' => 50,                      // int rating x 100
+			//'ratings' =>[						   // unuseful?
+			//	5 => 10,
+			//	4 => 4,
+			//	3 => 0,
+			//	2 => 0,
+			//	1 => 0,
+			//],                   // array( [5..0] )
+			//'requires' => true,                  // version string
+			//'support_threads_resolved' => true,  // int
+			//'support_threads' => true,           // int
+			//'tested' => true,                    // version string
+			//'versions' => true,                  // array( [version] url )
+		];
+
+		return (object) $result;
+
+	}
+
+	public function get_plugin_images($type, $plugin) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+		// From Update Manager
+
+		// Initialize.
+		$images = [];
+
+		// Need argument missing? Bail.
+		if (empty($plugin)) {
+			return $images;
+		}
+
+		// Not a valid size passed in? Bail.
+		if (!in_array($type, ['icon', 'banner', 'screenshot'], true)) {
+			return $images;
+		}
+
+		// Set path and URL to this plugin's own images directory.
+		$image_path = untrailingslashit(WP_PLUGIN_DIR).'/'.$plugin.'/images';
+		$image_url  = untrailingslashit(WP_PLUGIN_URL).'/'.$plugin.'/images';
+
+		// Banner and icon images are keyed differently; it's a core thing.
+		$image_qualities = [
+			'icon'   => ['default', '1x',  '2x'],
+			'banner' => ['default', 'low', 'high'],
+		];
+
+		// Array of dimensions for bannes and icons.
+		$image_dimensions = [
+			'icon'   => ['default' => '128',     '1x' => '128',      '2x' => '256'],
+			'banner' => ['default' => '772x250', 'low' => '772x250', 'high' => '1544x500'],
+		];
+
+		// Handle icon and banner requests.
+		if ($type === 'icon' || $type === 'banner') {
+			// For SVG banners/icons; one tiny loop handles both.
+			if (file_exists($image_path.'/'.$type.'.svg')) {
+				foreach ($image_qualities[$type] as $key) {
+					$images[$key] = $image_url.'/'.$type.'.svg';
+				}
+			} else {
+				// Ok, no svg. How about png or jpg?
+				// This loop doesn't break early, so, it favors png.
+				foreach (['jpg', 'png'] as $ext) {
+					// Pop keys off the end of the $images_qualities array.
+					$all_keys   = $image_qualities[$type];
+					$last_key   = array_pop($all_keys);
+					$middle_key = array_pop($all_keys);
+					// Normal size images found? Add them.
+					if (file_exists($image_path.'/'.$type.'-'.$image_dimensions[$type][$middle_key].'.'.$ext)) {
+						foreach ($image_qualities[$type] as $key) {
+							$images[$key] = $image_url.'/'.$type.'-'.$image_dimensions[$type][$middle_key].'.'.$ext;
+						}
+					}
+					// Retina image found? Add it.
+					if (file_exists($image_path.'/'.$type.'-'.$image_dimensions[$type][$last_key].'.'.$ext)) { // phpcs:ignore SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
+						$images[$last_key] = $image_url.'/'.$type.'-'.$image_dimensions[$type][$last_key].'.'.$ext;
+					}
+
+				} // foreach
+
+			} // inner if/else
+
+			// Return icon or banner URLs.
+			return $images;
+
+		}
+
+		// Oh, banners? Note these are from current version, not new version.
+		if ($type === 'screenshot') {
+
+			// Does /images/ directory exists? Prevent notices.
+			if (file_exists($image_path)) {
+
+				// Scan the directory.
+				$dir_contents = scandir($image_path);
+
+				// Capture only the screenshot URLs.
+				foreach ($dir_contents as $name) {
+					if (strpos(strtolower($name), 'screenshot') === 0) { // phpcs:ignore SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
+						$start = strpos($name, '-') + 1;
+						$for = strpos($name, '.') - $start;
+						$screenshot_number = substr($name, $start, $for);
+						$images[$screenshot_number] = $image_url.'/'.$name;
+					}
+				}
+
+				// Proper the sort.
+				ksort($images);
+
+			}
+
+		}
+
+		// Return any screenshot URLs.
+		return $images;
 
 	}
 
@@ -220,10 +394,11 @@ class Update {
 
 		foreach ($data_from_dir as $single_data) {
 			$data[$single_data['meta']['slug']] = [
-				'Download'    => $single_data['meta']['download_link'],
-				'Version'     => $single_data['meta']['current_version'],
-				'RequiresPHP' => $single_data['meta']['requires_php'],
-				'RequiresCP'  => $single_data['meta']['requires_cp'],
+				'Download'        => $single_data['meta']['download_link'],
+				'Version'         => $single_data['meta']['current_version'],
+				'RequiresPHP'     => $single_data['meta']['requires_php'],
+				'RequiresCP'      => $single_data['meta']['requires_cp'],
+				'active_installs' => $single_data['meta']['active_installations'],
 			];
 		}
 
