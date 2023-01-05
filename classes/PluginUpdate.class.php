@@ -209,7 +209,7 @@ class PluginUpdate {
 		}
 
 		// Add Visit site
-		array_push($links, '<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>');
+		array_push($links, '<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>'); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 
 		return $links;
 
