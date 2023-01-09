@@ -2,7 +2,11 @@
 
 namespace ClassicPress\Directory;
 
+require_once ABSPATH.'wp-admin/includes/class-wp-upgrader.php';
+
 class PluginInstall {
+
+	private $local_cp_plugins = false;
 
 	public function __construct() {
 
@@ -27,6 +31,39 @@ class PluginInstall {
 			[$this, 'render_menu']
 		);
 
+		add_action('load-'.$page, [$this, 'activate_action']);
+		add_action('load-'.$page, [$this, 'install_action']);
+
+	}
+
+	// Get all installed ClassicPress plugin
+	private function get_local_cp_plugins() {
+
+		if ($this->local_cp_plugins !== false) {
+			return $this->local_cp_plugins;
+		}
+
+		$all_plugins = get_plugins();
+		$cp_plugins  = [];
+		foreach ($all_plugins as $slug => $plugin) {
+			if (!array_key_exists('UpdateURI', $plugin)) {
+				continue;
+			}
+			if (strpos($plugin['UpdateURI'], \CLASSICPRESS_DIRECTORY_INTEGRATION_URL) !== 0) {
+				continue;
+			}
+			$cp_plugins[dirname($slug)] = [
+				'WPSlug'      => $slug,
+				'Name'        => $plugin['Name'],
+				'Version'     => $plugin['Version'],
+				'PluginURI'   => array_key_exists('PluginURI', $plugin) ? $plugin['PluginURI'] : null,
+				'Active'      => is_plugin_active($slug),
+			];
+		}
+
+		$this->local_cp_plugins = $cp_plugins;
+		return $this->local_cp_plugins;
+
 	}
 
 	public static function sanitize_args($args) {
@@ -38,7 +75,7 @@ class PluginInstall {
 					$args[$key] = (int) $value;
 					$sanitized = true;
 					break;
-				case 'by_slug':
+				case 'byslug':
 					$args[$key] = preg_replace('[^A-Za-z0-9\-_]', '', $value);
 					$sanitized = true;
 					break;
@@ -46,7 +83,10 @@ class PluginInstall {
 					$args[$key] = sanitize_text_field($value);
 					$sanitized = true;
 					break;
-
+				case '_fields':
+					$args[$key] = preg_replace('[^A-Za-z0-9\-_,]', '', $value);
+					$sanitized = true;
+					break;
 			}
 			if ($sanitized) {
 				continue;
@@ -69,6 +109,7 @@ class PluginInstall {
 		$args = self::sanitize_args($args);
 		$endpoint = \CLASSICPRESS_DIRECTORY_INTEGRATION_URL.$type;
 		$endpoint = add_query_arg($args, $endpoint);
+
 		$response = wp_remote_get($endpoint, ['user-agent' => classicpress_user_agent()]);
 
 		if (is_wp_error($response)) {
@@ -109,31 +150,206 @@ class PluginInstall {
 
 	}
 
-	// Add a test menu. ToDo: remove
+	private function add_notice($message, $failure = false) {
+		$other_notices = get_transient('cpdi_pi_notices');
+		$notice = $other_notices === false ? '' : $other_notices;
+		$failure_style = $failure ? 'notice-error' : 'notice-success';
+		$notice .= '<div class="notice '.$failure_style.' is-dismissible">';
+		$notice .= '    <p>'.esc_html($message).'</p>';
+		$notice .= '</div>';
+		set_transient('cpdi_pi_notices', $notice, \HOUR_IN_SECONDS);
+	}
+
+	private function display_notices() {
+		$notices = get_transient('cpdi_pi_notices');
+		if ($notices === false) {
+			return;
+		}
+		// This contains html formatted from 'add_notice' function that uses 'esc_html'.
+		echo $notices; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		delete_transient('cpdi_pi_notices');
+	}
+
+	public function activate_action() {
+
+		// Load local plugins information
+		$local_cp_plugins = $this->get_local_cp_plugins();
+
+		// Security checks
+		if (!isset($_GET['action'])) {
+			return;
+		}
+		if ($_GET['action'] !== 'activate') {
+			return;
+		}
+		if (!check_admin_referer('activate', '_cpdi')) {
+			return;
+		}
+		if (!current_user_can('activate_plugins')) {
+			return;
+		}
+		if (!isset($_REQUEST['slug'])) {
+			return;
+		}
+		// Check if plugin slug is proper
+		$slug = sanitize_key(wp_unslash($_REQUEST['slug']));
+		if (!array_key_exists($slug, $local_cp_plugins)) {
+			return;
+		}
+
+		// Activate plugin
+		$result = activate_plugin($local_cp_plugins[$slug]['WPSlug']);
+
+		if ($result !== null) {
+			// Translators: %1$s is the plugin name.
+			$message = sprintf(esc_html__('Error activating %1$s.', 'classicpress-directory-integration'), $local_cp_plugins[$slug]['Name']);
+			$this->add_notice($message, true);
+		} else {
+			// Translators: %1$s is the plugin name.
+			$message = sprintf(esc_html__('%1$s activated.', 'classicpress-directory-integration'), $local_cp_plugins[$slug]['Name']);
+			$this->add_notice($message, false);
+		}
+
+		$sendback = remove_query_arg(['action', 'slug', '_cpdi'], wp_get_referer());
+		wp_safe_redirect($sendback);
+		exit;
+
+	}
+
+	public function install_action() {
+
+		// Security checks
+		if (!isset($_GET['action'])) {
+			return;
+		}
+		if ($_GET['action'] !== 'install') {
+			return;
+		}
+		if (!check_admin_referer('install', '_cpdi')) {
+			return;
+		}
+		if (!current_user_can('install_plugins')) {
+			return;
+		}
+		if (!isset($_REQUEST['slug'])) {
+			return;
+		}
+		// Check if plugin slug is proper
+		$slug = sanitize_key(wp_unslash($_REQUEST['slug']));
+
+		// Get github release file
+		$args = [
+			'byslug'  => $slug,
+			'_fields' => 'meta,title',
+		];
+		$response = $this->do_directory_request($args, 'plugins');
+		if (!$response['success'] || !isset($response['response'][0]['meta']['download_link'])) {
+			// Translators: %1$s is the plugin name.
+			$message = sprintf(esc_html__('API error.', 'classicpress-directory-integration'), $local_cp_plugins[$slug]['Name']);
+			$this->add_notice($message, true);
+			$sendback = remove_query_arg(['action', 'slug', '_cpdi'], wp_get_referer());
+			wp_safe_redirect($sendback);
+			exit;
+		}
+
+		$installation_url = $response['response'][0]['meta']['download_link'];
+		$plugin_name      = $response['response'][0]['title']['rendered'];
+
+		// Install plugin
+		$skin     = new PluginInstallSkin(['type'  => 'plugin']);
+		$upgrader = new \Plugin_Upgrader($skin);
+		$response = $upgrader->install($installation_url);
+
+		if ($response !== true) {
+			// Translators: %1$s is the plugin name.
+			$message = sprintf(esc_html__('Error installing %1$s.', 'classicpress-directory-integration'), $plugin_name);
+			$this->add_notice($message, true);
+		} else {
+			// Translators: %1$s is the plugin name.
+			$message = sprintf(esc_html__('%1$s installed.', 'classicpress-directory-integration'), $plugin_name);
+			$this->add_notice($message, false);
+		}
+
+		$sendback = remove_query_arg(['action', 'slug', '_cpdi'], wp_get_referer());
+		wp_safe_redirect($sendback);
+		exit;
+
+	}
+
 	public function render_menu () {
-		echo '<h1>Directory</h1>';
 
-		echo '<pre>';
-echo sanitize_text_field('sort=alpha%3Cimg+src=xyz+onerror=alert(99)%3E%3Cxss/%3E');
+	// Display notices
+	$this->display_notices();
 
+	// Load local plugins information
+	$local_cp_plugins = $this->get_local_cp_plugins();
 
-$test = [
-	'by_slug' => '(ciao)',
-	'fuck' => 'you',
-	'per_page' => '39',
-	'page' => 'simo',
-];
+	// Set age number if empty
+	// We check nonces only on activations and installations.
+	// In this function nothing is modified.
+	$page = isset($_REQUEST['getpage']) ? (int) $_REQUEST['getpage'] : 1; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-$test = self::sanitize_args($test);
+	// Query the directory
+	$args = [
+		'per_page' => 10,
+		'page' => $page,
+	];
+	$result = $this->do_directory_request($args);
+	if ($result['success'] === false) {
+		// Query failed, display errors and exit.
+		echo esc_html($result['error']);
+	}
 
-//$x = self::do_directory_request(['per_page'=>'2', '_fields' => 'title'], 'plugins');
-var_dump($test);
-echo "\n" . (int) 'simo';
-//var_dump($x);
+	// Set up variables
+	$plugins = $result['response'];
+	$pages   = $result['total-pages'];
 
+	// Loop through plugins
+	foreach ($plugins as $plugin) {
+		$slug = $plugin['meta']['slug'];
+		echo '<h3>'.esc_html($plugin['title']['rendered']).'</h3>';
+		if (!array_key_exists($slug, $local_cp_plugins)) {
+			echo '<a href="'.esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'install','slug' => $slug]), 'install', '_cpdi')).'">'.esc_html__('Install', 'classicpress-directory-integration').'</a>';
+		}
+		if (array_key_exists($slug, $local_cp_plugins) && $local_cp_plugins[$slug]['Active']) {
+			echo 'You have it';
+		}
+		if (array_key_exists($slug, $local_cp_plugins) && !$local_cp_plugins[$slug]['Active']) { // phpcs:ignore SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
+			echo '<a href="'.esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate','slug' => $slug]), 'activate', '_cpdi')).'">'.esc_html__('Activate', 'classicpress-directory-integration').'</a>';
+		}
+	}
+
+	echo '<hr><pre>';
+
+	// tests here
+
+	echo '</pre><hr>';
+
+	// Pagination links
+	for ($x = 1; $x <= $pages; $x++) {
+		$allowed_html = ($x == $page) ? [] : ['a' => ['href' => []]]; //phpcs:ignore SlevomatCodingStandard.Operators.DisallowEqualOperators.DisallowedEqualOperator
+		$link = '<a href="'.esc_url_raw(add_query_arg(['getpage' => $x], remove_query_arg('getpage'))).'">'.(int)$x.'</a> ';
+		echo wp_kses($link, $allowed_html);
+	}
 
 		echo '</pre>';
 
+	}
+
+}
+
+class PluginInstallSkin extends \Plugin_Installer_Skin {
+
+	public function header() {
+	}
+
+	public function footer() {
+	}
+
+	public function error($errors) {
+	}
+
+	public function feedback($string, ...$args) {
 	}
 
 }
