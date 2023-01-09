@@ -8,6 +8,8 @@ class PluginInstall {
 
 	private $local_cp_plugins = false;
 
+	private $page = null;
+
 	public function __construct() {
 
 		// Add menu under plugins.
@@ -22,7 +24,7 @@ class PluginInstall {
 			return;
 		}
 
-		$page = add_submenu_page(
+		$this->page = add_submenu_page(
 			'plugins.php',
 			esc_html__('Install ClassicPress plugins', 'classicpress-directory-integration'),
 			esc_html__('Install CP plugins', 'classicpress-directory-integration'),
@@ -31,12 +33,15 @@ class PluginInstall {
 			[$this, 'render_menu']
 		);
 
-		add_action('load-'.$page, [$this, 'activate_action']);
-		add_action('load-'.$page, [$this, 'install_action']);
+		add_action('load-'.$this->page, [$this, 'activate_action']);
+		add_action('load-'.$this->page, [$this, 'install_action']);
 
 	}
 
 	// Get all installed ClassicPress plugin
+	// This function is different from the one in PluginUpdate class
+	// and considers a plugin from the dir not only if if has UpdateURI
+	// but also if it have RequiresCP.
 	private function get_local_cp_plugins() {
 
 		if ($this->local_cp_plugins !== false) {
@@ -46,10 +51,10 @@ class PluginInstall {
 		$all_plugins = get_plugins();
 		$cp_plugins  = [];
 		foreach ($all_plugins as $slug => $plugin) {
-			if (!array_key_exists('UpdateURI', $plugin)) {
+			if (!array_key_exists('UpdateURI', $plugin) && !array_key_exists('RequiresCP', $plugin)) {
 				continue;
 			}
-			if (strpos($plugin['UpdateURI'], \CLASSICPRESS_DIRECTORY_INTEGRATION_URL) !== 0) {
+			if (strpos($plugin['UpdateURI'], \CLASSICPRESS_DIRECTORY_INTEGRATION_URL) !== 0 && !array_key_exists('RequiresCP', $plugin)) {
 				continue;
 			}
 			$cp_plugins[dirname($slug)] = [
@@ -66,6 +71,7 @@ class PluginInstall {
 
 	}
 
+	// Validate and sanitize args for quering the ClassicPress Directory
 	public static function sanitize_args($args) {
 		foreach ($args as $key => $value) {
 			$sanitized = false;
@@ -96,7 +102,7 @@ class PluginInstall {
 		return $args;
 	}
 
-
+	// Query the ClassicPress Directory
 	public static function do_directory_request($args = [], $type = 'plugins') {
 
 		$result['success'] = false;
@@ -150,6 +156,7 @@ class PluginInstall {
 
 	}
 
+	// Enqueue a notice
 	private function add_notice($message, $failure = false) {
 		$other_notices = get_transient('cpdi_pi_notices');
 		$notice = $other_notices === false ? '' : $other_notices;
@@ -160,6 +167,7 @@ class PluginInstall {
 		set_transient('cpdi_pi_notices', $notice, \HOUR_IN_SECONDS);
 	}
 
+	// Display notices
 	private function display_notices() {
 		$notices = get_transient('cpdi_pi_notices');
 		if ($notices === false) {
@@ -170,6 +178,7 @@ class PluginInstall {
 		delete_transient('cpdi_pi_notices');
 	}
 
+	// Deal with activation requests
 	public function activate_action() {
 
 		// Load local plugins information
@@ -216,6 +225,7 @@ class PluginInstall {
 
 	}
 
+	// Deal with installation requests
 	public function install_action() {
 
 		// Security checks
@@ -276,7 +286,8 @@ class PluginInstall {
 
 	}
 
-	public function render_menu () {
+	// Render "Install CP plugins" menu
+	public function render_menu () { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 	// Display notices
 	$this->display_notices();
@@ -287,13 +298,18 @@ class PluginInstall {
 	// Set age number if empty
 	// We check nonces only on activations and installations.
 	// In this function nothing is modified.
-	$page = isset($_REQUEST['getpage']) ? (int) $_REQUEST['getpage'] : 1; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$page   = isset($_REQUEST['getpage']) ? (int) $_REQUEST['getpage'] : 1; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 	// Query the directory
 	$args = [
 		'per_page' => 10,
-		'page' => $page,
+		'page'     => $page,
 	];
+
+	if (isset($_REQUEST['searchfor'])) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$args['search'] = sanitize_text_field(wp_unslash($_REQUEST['searchfor'])); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	}
+
 	$result = $this->do_directory_request($args);
 	if ($result['success'] === false) {
 		// Query failed, display errors and exit.
@@ -303,6 +319,18 @@ class PluginInstall {
 	// Set up variables
 	$plugins = $result['response'];
 	$pages   = $result['total-pages'];
+
+	// Search form
+	echo '<form method="GET" action="'.esc_url(add_query_arg(['page' => 'classicpress-directory-integration-plugin-install'], remove_query_arg(['getpage']))).'">';
+	echo '<label for="searchfor">'.esc_html__('Search', 'classicpress-directory-integration').'</label><br>';
+	echo '<input type="text" id="searchfor" name="searchfor" placeholder="'.esc_html__('Search a plugin...', 'classicpress-directory-integration').'"><br>';
+	foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if (in_array($key, ['searchfor'])) {
+			continue;
+		}
+		echo '<input type="hidden" name="'.esc_attr($key).'" value="'.esc_html($val).'" />';
+	}
+	echo '</form>';
 
 	// Loop through plugins
 	foreach ($plugins as $plugin) {
@@ -321,7 +349,7 @@ class PluginInstall {
 
 	echo '<hr><pre>';
 
-	// tests here
+// tests here
 
 	echo '</pre><hr>';
 
