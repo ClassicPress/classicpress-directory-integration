@@ -14,7 +14,23 @@ class PluginInstall {
 
 		// Add menu under plugins.
 		add_action('admin_menu', [$this, 'create_menu'], 100);
+		add_action('admin_enqueue_scripts', [$this, 'styles']);
+		add_action('admin_enqueue_scripts', [$this, 'scripts']);
 
+	}
+
+	public function styles($hook) {
+		if ($hook !== $this->page) {
+			return;
+		}
+		wp_enqueue_style('classicpress-directory-integration-css', plugins_url('../styles/plugin-page.css', __FILE__), []);
+	}
+
+	public function scripts($hook) {
+		if ($hook !== $this->page) {
+			return;
+		}
+		wp_enqueue_script('classicpress-directory-integration-js', plugins_url('../scripts/plugin-page.js', __FILE__), ['jquery'], false, true);
 	}
 
 	// Add a test menu. ToDo: remove

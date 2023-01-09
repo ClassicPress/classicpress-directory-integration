@@ -41,5 +41,8 @@ $plugin_update = new PluginUpdate();
 require_once 'classes/PluginInstall.class.php';
 $plugin_install = new PluginInstall();
 
-
-
+// Register text domain
+function register_text_domain() {
+	load_plugin_textdomain('classicpress-directory-integration', false, dirname(plugin_basename(__FILE__)).'/languages');
+}
+add_action('plugins_loaded', '\ClassicPress\Directory\register_text_domain');
