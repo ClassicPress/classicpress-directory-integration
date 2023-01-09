@@ -2,8 +2,8 @@
 
 Steps
 - [X] Create plugin update system that pulls from the directory
-- [ ] Create plugin page
-- [ ] Create theme update system that pulls from the directory (may need Changeset 53933)
+- [X] Create plugin page
+- [ ] Create theme update system that pulls from the directory (may need Changeset 53933 or ClassicPress v.2)
 - [ ] Create theme page
 
 ## Plugin from the directory now can update as WP.org plugins.
@@ -25,3 +25,4 @@ Use this header for testing:
 - Images are pulled in (if they are in `images/` folder) <br /><img width="588" alt="Schermata 2023-01-02 alle 16 46 11" src="https://user-images.githubusercontent.com/29772709/210253842-b241321b-00dc-40ca-a7d0-e5b1c577935e.png">
 
 
+## Plugin from the directory now can be installed using the "Install CP plugins" menu under "Plugins" menu.
