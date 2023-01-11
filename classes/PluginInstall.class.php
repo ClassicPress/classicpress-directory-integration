@@ -305,78 +305,103 @@ class PluginInstall {
 	// Render "Install CP plugins" menu
 	public function render_menu () { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-	// Display notices
-	$this->display_notices();
+		// Display notices
+		$this->display_notices();
 
-	// Load local plugins information
-	$local_cp_plugins = $this->get_local_cp_plugins();
+		// Load local plugins information
+		$local_cp_plugins = $this->get_local_cp_plugins();
 
-	// Set age number if empty
-	// We check nonces only on activations and installations.
-	// In this function nothing is modified.
-	$page   = isset($_REQUEST['getpage']) ? (int) $_REQUEST['getpage'] : 1; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// Set age number if empty
+		// We check nonces only on activations and installations.
+		// In this function nothing is modified.
+		$page   = isset($_REQUEST['getpage']) ? (int) $_REQUEST['getpage'] : 1; //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-	// Query the directory
-	$args = [
-		'per_page' => 10,
-		'page'     => $page,
-	];
+		// Query the directory
+		$args = [
+			'per_page' => 10,
+			'page'     => $page,
+		];
 
-	if (isset($_REQUEST['searchfor'])) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$args['search'] = sanitize_text_field(wp_unslash($_REQUEST['searchfor'])); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	}
-
-	$result = $this->do_directory_request($args);
-	if ($result['success'] === false) {
-		// Query failed, display errors and exit.
-		echo esc_html($result['error']);
-	}
-
-	// Set up variables
-	$plugins = $result['response'];
-	$pages   = $result['total-pages'];
-
-	// Search form
-	echo '<form method="GET" action="'.esc_url(add_query_arg(['page' => 'classicpress-directory-integration-plugin-install'], remove_query_arg(['getpage']))).'">';
-	echo '<label for="searchfor">'.esc_html__('Search', 'classicpress-directory-integration').'</label><br>';
-	echo '<input type="text" id="searchfor" name="searchfor" placeholder="'.esc_html__('Search a plugin...', 'classicpress-directory-integration').'"><br>';
-	foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if (in_array($key, ['searchfor'])) {
-			continue;
+		if (isset($_REQUEST['searchfor'])) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['search'] = sanitize_text_field(wp_unslash($_REQUEST['searchfor'])); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
-		echo '<input type="hidden" name="'.esc_attr($key).'" value="'.esc_html($val).'" />';
-	}
-	echo '</form>';
 
-	// Loop through plugins
-	foreach ($plugins as $plugin) {
-		$slug = $plugin['meta']['slug'];
-		echo '<h3>'.esc_html($plugin['title']['rendered']).'</h3>';
-		if (!array_key_exists($slug, $local_cp_plugins)) {
-			echo '<a href="'.esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'install','slug' => $slug]), 'install', '_cpdi')).'">'.esc_html__('Install', 'classicpress-directory-integration').'</a>';
+		$result = $this->do_directory_request($args);
+		if ($result['success'] === false) {
+			// Query failed, display errors and exit.
+			echo esc_html($result['error']);
 		}
-		if (array_key_exists($slug, $local_cp_plugins) && $local_cp_plugins[$slug]['Active']) {
-			echo 'You have it';
+
+		// Set up variables
+		$plugins = $result['response'];
+		$pages   = $result['total-pages'];
+
+		// Search form
+		echo '<form method="GET" action="'.esc_url(add_query_arg(['page' => 'classicpress-directory-integration-plugin-install'], remove_query_arg(['getpage']))).'">';
+		echo '<label for="searchfor">'.esc_html__('Search', 'classicpress-directory-integration').'</label><br>';
+		echo '<input type="text" id="searchfor" name="searchfor" placeholder="'.esc_html__('Search a plugin...', 'classicpress-directory-integration').'"><br>';
+		foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if (in_array($key, ['searchfor'])) {
+				continue;
+			}
+			echo '<input type="hidden" name="'.esc_attr($key).'" value="'.esc_html($val).'" />';
 		}
-		if (array_key_exists($slug, $local_cp_plugins) && !$local_cp_plugins[$slug]['Active']) { // phpcs:ignore SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
-			echo '<a href="'.esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate','slug' => $slug]), 'activate', '_cpdi')).'">'.esc_html__('Activate', 'classicpress-directory-integration').'</a>';
+		echo '</form>';
+
+		if ($plugins === []) {
+			esc_html_e('No plugins found.', 'classicpress-directory-integration');
 		}
-	}
 
-	echo '<hr><pre>';
+		// Loop through plugins
+		foreach ($plugins as $plugin) {
 
-// tests here
+			echo '<article>';
 
-	echo '</pre><hr>';
+			//Title and author
+			$slug = $plugin['meta']['slug'];
+			echo '<h3>'.esc_html($plugin['title']['rendered']).'</h3>';
+			// Translators: %1$s is the author. Can use <b> tag.
+			echo '<p>'.wp_kses(sprintf(__('By <b>%1$s</b>.', 'classicpress-directory-integration'), $plugin['meta']['developer_name']), ['b' => []]).'</p>';
 
-	// Pagination links
-	for ($x = 1; $x <= $pages; $x++) {
-		$allowed_html = ($x == $page) ? [] : ['a' => ['href' => []]]; //phpcs:ignore SlevomatCodingStandard.Operators.DisallowEqualOperators.DisallowedEqualOperator
-		$link = '<a href="'.esc_url_raw(add_query_arg(['getpage' => $x], remove_query_arg('getpage'))).'">'.(int)$x.'</a> ';
-		echo wp_kses($link, $allowed_html);
-	}
+			// Excerpt
+			echo '<p><i>'.wp_kses_post($plugin['excerpt']['rendered']).'</i></p>';
 
-		echo '</pre>';
+			// Full description
+			echo '<div class="full-description"><quote>'.wp_kses_post($plugin['content']['rendered']).'</quote></div>';
+
+			// Categories
+			echo '<ol>';
+			foreach (explode(',', $plugin['meta']['category_names']) as $category) {
+				echo '<li>'.esc_html($category).'</li>';
+			}
+			echo '</ol>';
+
+			// Requires and active installations
+			echo '<p>'.esc_html__('Requires PHP: ', 'classicpress-directory-integration').esc_html($plugin['meta']['requires_php']).'</p>';
+			echo '<p>'.esc_html__('Requires ClassicPress: ', 'classicpress-directory-integration').esc_html($plugin['meta']['requires_cp']).'</p>';
+			echo '<p>'.esc_html__('Installations: ', 'classicpress-directory-integration').esc_html($plugin['meta']['active_installations']).'</p>';
+
+			if (!array_key_exists($slug, $local_cp_plugins)) {
+				echo '<a href="'.esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'install','slug' => $slug]), 'install', '_cpdi')).'">'.esc_html__('Install', 'classicpress-directory-integration').'</a>';
+			}
+			if (array_key_exists($slug, $local_cp_plugins) && $local_cp_plugins[$slug]['Active']) {
+				esc_html_e('Installed.', 'classicpress-directory-integration');
+			}
+			if (array_key_exists($slug, $local_cp_plugins) && !$local_cp_plugins[$slug]['Active']) { // phpcs:ignore SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
+				echo '<a href="'.esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate','slug' => $slug]), 'activate', '_cpdi')).'">'.esc_html__('Activate', 'classicpress-directory-integration').'</a>';
+			}
+
+			echo '</article>';
+
+		}
+
+		// Pagination links
+		echo '<hr>';
+		for ($x = 1; $x <= $pages; $x++) {
+			$allowed_html = ($x == $page) ? [] : ['a' => ['href' => []]]; //phpcs:ignore SlevomatCodingStandard.Operators.DisallowEqualOperators.DisallowedEqualOperator
+			$link = '<a href="'.esc_url_raw(add_query_arg(['getpage' => $x], remove_query_arg('getpage'))).'">'.(int)$x.'</a> ';
+			echo wp_kses($link, $allowed_html);
+		}
 
 	}
 

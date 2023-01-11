@@ -9,9 +9,6 @@ class PluginUpdate {
 
 	public function __construct() {
 
-		// Add a test menu. ToDo: remove
-		add_action('admin_menu', [$this, 'create_test_menu'], 100);
-
 		// Hook to check for updates
 		$update_plugins_hook = 'update_plugins_'.wp_parse_url(\CLASSICPRESS_DIRECTORY_INTEGRATION_URL, PHP_URL_HOST);
 		add_filter($update_plugins_hook, [$this, 'update_uri_filter'], 10, 4);
@@ -274,25 +271,6 @@ class PluginUpdate {
 			[$this, 'render_test_page'],
 			'dashicons-pets'
 		);
-	}
-
-	// Add a test menu. ToDo: remove
-	public function render_test_page () {
-
-		delete_transient('cpdi_directory_data');
-
-		echo '<h1>Local CP plugins</h1>';
-		echo '<pre>';
-		$plugins = $this->get_cp_plugins();
-		var_dump($plugins); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_dump
-		echo '</pre>';
-
-		echo '<h1>Dir CP plugins</h1>';
-		echo '<pre>';
-		$dir = $this->get_directory_data();
-		var_dump($dir); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_dump
-		echo '</pre>';
-
 	}
 
 	// Get all installed ClassicPress plugin
