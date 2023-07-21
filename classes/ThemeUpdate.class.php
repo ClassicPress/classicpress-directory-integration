@@ -13,9 +13,6 @@ class ThemeUpdate {
 		$update_plugins_hook = 'update_themes_'.wp_parse_url(\CLASSICPRESS_DIRECTORY_INTEGRATION_URL, PHP_URL_HOST);
 		add_filter($update_plugins_hook, [$this, 'update_uri_filter'], 10, 4);
 
-		// Hooks to refresh directory data
-		//add_action('activated_plugin', [$this, 'refresh_cp_directory_data']);
-
 	}
 
 	// Get all installed ClassicPress themes
@@ -93,27 +90,27 @@ class ThemeUpdate {
 	// Filter to trigger updates using Update URI header
 	public function update_uri_filter($update, $theme_data, $theme_stylesheet, $locales) {
 
-		// https://developer.wordpress.org/reference/hooks/update_plugins_hostname/
+		// https://developer.wordpress.org/reference/hooks/update_themes_hostname/
 
 		// Get the slug from Update URI
 		if (preg_match('/themes\?byslug=(.*)/', $theme_data['UpdateURI'], $matches) !== 1) {
 			return false;
 		}
 
-		// Check if the slug matches plugin file
+		// Check if the slug matches theme dir
 		if (!isset($matches[1]) || $theme_stylesheet !== $matches[1]) {
 			return false;
 		}
 		$slug = $matches[1];
 
-		// Check if we have that plugin in installed ones
+		// Check if we have that theme in installed ones
 		$themes  = $this->get_cp_themes();
 
 		if (!array_key_exists($slug, $themes)) {
 			return false;
 		}
 
-		// Check if we have that plugin in directory ones
+		// Check if we have that theme in directory ones
 		$dir_data = $this->get_directory_data();
 		if (!array_key_exists($slug, $dir_data)) {
 			return false;
