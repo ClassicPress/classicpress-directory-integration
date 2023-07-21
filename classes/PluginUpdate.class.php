@@ -222,6 +222,11 @@ class PluginUpdate {
 		}
 
 		$dir_data = $this->get_directory_data();
+
+		if (!array_key_exists($slug, $dir_data)) {
+			return;
+		}
+
 		$data     = $dir_data[$slug];
 		$plugin   = $plugins[$slug];
 
