@@ -414,7 +414,7 @@ class PluginInstall
 						for ($x = 1; $x <= $pages; $x++) {
 							$current_page = ($x == $page) ? ' cp-current-page" aria-current="page' : '';
 							$link = '<a href="' . esc_url_raw(add_query_arg(['getpage' => $x], remove_query_arg('getpage'))) . '">' . (int)$x . '</a>';
-							echo '<li class="cp-search-page-item' . esc_html($current_page) . '">' .  wp_kses($link, ['a'=>['href'=>[]]]) . '</li>';
+							echo '<li class="cp-search-page-item' . wp_kses_post($current_page) . '">' . wp_kses_post($link) . '</li>';
 						}
 						?>
 					</ul>
