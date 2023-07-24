@@ -137,6 +137,7 @@ class ThemeUpdate {
 			'version'      => $data['Version'],
 			'package'      => $data['Download'],
 			'requires_php' => $data['RequiresPHP'],
+			'requires_cp'  => $data['RequiresCP'],
 			'url'          => 'https://'.wp_parse_url(\CLASSICPRESS_DIRECTORY_INTEGRATION_URL, PHP_URL_HOST).'/themes/'.$theme_stylesheet,
 		];
 
