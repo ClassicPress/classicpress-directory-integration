@@ -2,17 +2,16 @@
 
 /**
  * -----------------------------------------------------------------------------
- * Plugin Name: ClassicPress Directory Integration
- * Description: Desc.
- * Version: 0.1.0
- * Author: ClassicPress Contributors
- * Author URI: https://www.classicpress.net
- * Plugin URI: https://www.classicpress.net
- * Text Domain: classicpress-directory-integration
- * Domain Path: /languages
- * Requires PHP: 5.6
- * Requires CP: 1.5
- * Update URI: https://directory.classicpress.net/wp-json/wp/v2/plugins?byslug=classicpress-directory-integration
+ * Plugin Name:  ClassicPress Directory Integration
+ * Description:  Install and update plugins from ClassicPress directory and keep ClassicPress themes updated.
+ * Version:      0.1.0
+ * Author:       ClassicPress Contributors
+ * Author URI:   https://www.classicpress.net
+ * Plugin URI:   https://www.classicpress.net
+ * Text Domain:  classicpress-directory-integration
+ * Domain Path:  /languages
+ * Requires PHP: 7.4
+ * Requires CP:  2.0
  * -----------------------------------------------------------------------------
  * This is free software released under the terms of the General Public License,
  * version 2, or later. It is distributed WITHOUT ANY WARRANTY; without even the
@@ -40,6 +39,10 @@ $plugin_update = new PluginUpdate();
 // Load Plugin Install functionality class.
 require_once 'classes/PluginInstall.class.php';
 $plugin_install = new PluginInstall();
+
+// Load Theme Update functionality class.
+require_once 'classes/ThemeUpdate.class.php';
+$theme_update = new ThemeUpdate();
 
 // Register text domain
 function register_text_domain() {

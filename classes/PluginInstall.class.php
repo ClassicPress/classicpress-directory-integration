@@ -344,11 +344,11 @@ class PluginInstall
 ?>
 
 		<div class="wrap plugin-install-tab">
-			<h1 class="wp-heading-inline"><?php _e('Plugins', 'classicpress-directory-integration'); ?></h1>
+			<h1 class="wp-heading-inline"><?php esc_html__('Plugins', 'classicpress-directory-integration'); ?></h1>
 			<hr class="wp-header-end">
 
 			<div class="cp-plugins-page">
-				<h3 class="screen-reader-text"><?php echo esc_html__('Plugins list'); ?></h3>
+				<h3 class="screen-reader-text"><?php echo esc_html__('Plugins list', 'classicpress-directory-integration'); ?></h3>
 				<!-- Search form -->
 				<div class="cp-plugin-search-form">
 					<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-plugin-install'], remove_query_arg(['getpage']))); ?>">
@@ -393,7 +393,7 @@ class PluginInstall
 										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'install', 'slug' => $slug]), 'install', '_cpdi')) . '" class="button install-now">' . esc_html__('Install', 'classicpress-directory-integration') . '</a>';
 									}
 									if (array_key_exists($slug, $local_cp_plugins) && $local_cp_plugins[$slug]['Active']) {
-										echo '<span class="cp-plugin-installed">' . esc_html('Installed', 'classicpress-directory-integration') . '</span>';
+										echo '<span class="cp-plugin-installed">' . esc_html__('Installed', 'classicpress-directory-integration') . '</span>';
 									}
 									if (array_key_exists($slug, $local_cp_plugins) && !$local_cp_plugins[$slug]['Active']) {
 										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate', 'slug' => $slug]), 'activate', '_cpdi')) . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
@@ -414,7 +414,7 @@ class PluginInstall
 						for ($x = 1; $x <= $pages; $x++) {
 							$current_page = ($x == $page) ? ' cp-current-page" aria-current="page' : '';
 							$link = '<a href="' . esc_url_raw(add_query_arg(['getpage' => $x], remove_query_arg('getpage'))) . '">' . (int)$x . '</a>';
-							echo '<li class="cp-search-page-item' . $current_page . '">' . $link . '</li>';
+							echo '<li class="cp-search-page-item' . wp_kses_post($current_page) . '">' . wp_kses_post($link) . '</li>';
 						}
 						?>
 					</ul>

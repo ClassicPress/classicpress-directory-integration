@@ -222,6 +222,11 @@ class PluginUpdate {
 		}
 
 		$dir_data = $this->get_directory_data();
+
+		if (!array_key_exists($slug, $dir_data)) {
+			return;
+		}
+
 		$data     = $dir_data[$slug];
 		$plugin   = $plugins[$slug];
 
@@ -394,6 +399,7 @@ class PluginUpdate {
 			'version'      => $data['Version'],
 			'package'      => $data['Download'],
 			'requires_php' => $data['RequiresPHP'],
+			'requires_cp'  => $data['RequiresCP'],
 			'banners'      => $this->get_plugin_images('banner', $slug),
 			'icons'        => $this->get_plugin_images('icon', $slug),
 
