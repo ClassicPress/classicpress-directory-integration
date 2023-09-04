@@ -49,3 +49,9 @@ function register_text_domain() {
 	load_plugin_textdomain('classicpress-directory-integration', false, dirname(plugin_basename(__FILE__)).'/languages');
 }
 add_action('plugins_loaded', '\ClassicPress\Directory\register_text_domain');
+
+// Add commands to WP-CLI
+require_once 'classes/WPCLI.class.php';
+if (defined('WP_CLI') && WP_CLI) {
+	\WP_CLI::add_command('cpdi', '\ClassicPress\Directory\CPDICLI');
+}
