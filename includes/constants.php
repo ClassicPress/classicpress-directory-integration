@@ -17,4 +17,4 @@ if (!defined('ABSPATH')) {
 }
 
 define ('CLASSICPRESS_DIRECTORY_INTEGRATION_VERSION', '0.1.0');
-define ('CLASSICPRESS_DIRECTORY_INTEGRATION_URL', 'https://staging-directory.classicpress.net/wp-json/wp/v2/');
+define ('CLASSICPRESS_DIRECTORY_INTEGRATION_URL', 'https://directory.classicpress.net/wp-json/wp/v2/');
