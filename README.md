@@ -26,3 +26,7 @@ Use this header for testing:
 
 
 ## Plugin from the directory now can be installed using the "Install CP plugins" menu under "Plugins" menu.
+
+## WP-CLI commands
+
+- Flush transients: `wp cpdi flush`
