@@ -41,6 +41,13 @@ require_once 'classes/PluginInstall.class.php';
 $plugin_install = new PluginInstall();
 
 // Modify Plugins menu.
+/**
+ * Filters the change of Plugins menu.
+ *
+ * @since 1.0.0
+ *
+ * @param bool $change Keep the old Plugins menu. Default false.
+ */
 if (!apply_filters('cpdi_old_plugin_menu', false)) {
 	require_once 'classes/PluginPage.class.php';
 	$new_plugin_page = new PluginPage();
