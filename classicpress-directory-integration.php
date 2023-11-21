@@ -40,6 +40,12 @@ $plugin_update = new PluginUpdate();
 require_once 'classes/PluginInstall.class.php';
 $plugin_install = new PluginInstall();
 
+// Modify Plugins menu.
+if (!apply_filters('cpdi_old_plugin_menu', false)) {
+	require_once 'classes/PluginPage.class.php';
+	$new_plugin_page = new PluginPage();
+}
+
 // Load Theme Update functionality class.
 require_once 'classes/ThemeUpdate.class.php';
 $theme_update = new ThemeUpdate();
