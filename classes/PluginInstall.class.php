@@ -18,6 +18,7 @@ class PluginInstall
 		add_action('admin_menu', [$this, 'create_menu'], 100);
 		add_action('admin_enqueue_scripts', [$this, 'styles']);
 		add_action('admin_enqueue_scripts', [$this, 'scripts']);
+		add_action('admin_menu', [$this, 'rename_menu']);
 	}
 
 	public function styles($hook)
@@ -36,7 +37,6 @@ class PluginInstall
 		wp_enqueue_script('classicpress-directory-integration-js', plugins_url('../scripts/plugin-page.js', __FILE__), ['jquery'], false, true);
 	}
 
-	// Add a test menu. ToDo: remove
 	public function create_menu()
 	{
 
@@ -50,11 +50,22 @@ class PluginInstall
 			esc_html__('Install CP plugins', 'classicpress-directory-integration'),
 			'install_plugins',
 			'classicpress-directory-integration-plugin-install',
-			[$this, 'render_menu']
+			[$this, 'render_menu'],
+			2
 		);
 
 		add_action('load-' . $this->page, [$this, 'activate_action']);
 		add_action('load-' . $this->page, [$this, 'install_action']);
+	}
+
+	public function rename_menu() {
+		global $submenu;
+		foreach ( $submenu['plugins.php'] as $key => $value ) {
+			if($value[2] !== 'plugin-install.php') {
+				continue;
+			}
+			$submenu['plugins.php'][$key][0] = esc_html__('Install WP plugins', 'classicpress-directory-integration'); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		}
 	}
 
 	// Get all installed ClassicPress plugin
