@@ -14,7 +14,6 @@ class PluginUpdate {
 		add_filter($update_plugins_hook, [$this, 'update_uri_filter'], 10, 4);
 
 		// Deal with row meta
-		add_filter('plugin_row_meta', [$this, 'plugin_row_meta'], 100, 2);
 		add_filter('after_plugin_row', [$this, 'after_plugin_row'], 100, 3);
 		add_filter('plugins_api_result', [$this, 'plugin_information'], 100, 3);
 
@@ -193,22 +192,6 @@ class PluginUpdate {
 
 		// Return any screenshot URLs.
 		return $images;
-
-	}
-
-	public function plugin_row_meta($links, $file) {
-
-		$slug    = dirname($file);
-		$plugins = $this->get_cp_plugins();
-
-		if (!array_key_exists($slug, $plugins)) {
-			return $links;
-		}
-
-		// Add Visit site
-		array_push($links, '<a href="'.esc_url_raw($plugins[$slug]['PluginURI']).'">'.esc_html__('Visit plugin site').'</a>'); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-
-		return $links;
 
 	}
 
