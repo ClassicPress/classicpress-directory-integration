@@ -13,7 +13,6 @@ class PluginInstall
 
 	public function __construct()
 	{
-
 		// Add menu under plugins.
 		add_action('admin_menu', [$this, 'create_menu'], 100);
 		add_action('admin_enqueue_scripts', [$this, 'styles']);
@@ -39,7 +38,6 @@ class PluginInstall
 
 	public function create_menu()
 	{
-
 		if (!current_user_can('install_plugins')) {
 			return;
 		}
@@ -136,7 +134,6 @@ class PluginInstall
 	// Query the ClassicPress Directory
 	public static function do_directory_request($args = [], $type = 'plugins')
 	{
-
 		$result['success'] = false;
 
 		if (!in_array($type, ['plugins', 'themes'])) {
@@ -322,9 +319,6 @@ class PluginInstall
 	// Render "Install CP plugins" menu
 	public function render_menu()
 	{ // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-		// Display notices
-		$this->display_notices();
-
 		// Load local plugins information
 		$local_cp_plugins = $this->get_local_cp_plugins();
 
@@ -346,12 +340,19 @@ class PluginInstall
 		$result = $this->do_directory_request($args);
 		if ($result['success'] === false) {
 			// Query failed, display errors and exit.
-			echo esc_html($result['error']);
+			$this->add_notice(esc_html($result['error']).' ('.esc_html($result['code']).').', true);
 		}
 
 		// Set up variables
-		$plugins = $result['response'];
-		$pages   = $result['total-pages'];
+		$plugins = $result['response'] ?? [];
+		$pages   = $result['total-pages'] ?? 0;
+
+		if ($plugins === []) {
+			$this->add_notice(esc_html__('No plugins found.', 'classicpress-directory-integration'), true);
+		}
+
+		// Display notices
+		$this->display_notices();
 ?>
 
 		<div class="wrap plugin-install-tab">
@@ -375,13 +376,6 @@ class PluginInstall
 						?>
 					</form>
 				</div>
-
-				<?php
-				if ($plugins === []) {
-					esc_html_e('No plugins found.', 'classicpress-directory-integration');
-				}
-				?>
-
 				<div class="cp-plugin-cards">
 					<?php
 					foreach ($plugins as $plugin) {
