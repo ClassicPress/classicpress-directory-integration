@@ -390,9 +390,9 @@ class PluginInstall
 								<div class="cp-plugin-description"><?php echo wp_kses_post($plugin['excerpt']['rendered']); ?></div>
 							</div>
 							<footer class="cp-plugin-card-footer">
-								<div class="cp-plugin-installs"><?php echo esc_html($plugin['meta']['active_installations']) . esc_html__(' Active Installations', 'classicpress-directory-integration'); ?></div>
+								<div class="cp-plugin-installs"><?php echo esc_html($plugin['meta']['active_installations'] === '' ? 0 : $plugin['meta']['active_installations']) . esc_html__(' Active Installations', 'classicpress-directory-integration'); ?></div>
 								<div class="cp-plugin-actions">
-									<a href="#" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
+									<a href="https://directory.classicpress.net/plugins/<?php echo esc_attr( $slug ); ?>" target="_blank" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
 									<?php
 									if (!array_key_exists($slug, $local_cp_plugins)) {
 										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'install', 'slug' => $slug]), 'install', '_cpdi')) . '" class="button install-now">' . esc_html__('Install', 'classicpress-directory-integration') . '</a>';
