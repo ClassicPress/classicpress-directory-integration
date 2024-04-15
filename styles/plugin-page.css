@@ -1,4 +1,18 @@
+.plugin-install-tab h1 {
+	margin-bottom: 1em;
+}
+
+.cp-plugin-search-box {
+	float: right;
+	margin: -5em 0 0;
+}
+
+.wp-filter-search {
+	width: 280px;
+}
+
 .cp-plugin-cards {
+	margin-bottom: 3em;
     display: grid;
     grid-template-columns: 1fr;
     grid-gap: 3em;
@@ -57,9 +71,15 @@
 }
 
 .cp-plugin-actions .button.link-txt {
-    border: none;
+    border: 1px solid transparent;
     box-shadow: none;
-    line-height: 28px;
+}
+
+.cp-plugin-actions .button:hover,
+.cp-plugin-actions .button:focus {
+	color: #fff;
+	background-color: #2271b1;
+	border-color: #185281;
 }
 
 .cp-plugin-actions .cp-plugin-installed {
@@ -98,9 +118,11 @@
     text-align: center;
     text-decoration: none;
     color: #666;
+    margin-right: 5px;
 }
 
-.cp-plugins-pagination li a:hover {
+.cp-plugins-pagination li a:hover,
+.cp-plugins-pagination li a:focus {
     border-color: #5b9dd9;
     color: #fff;
     background: #00a0d2;
