@@ -54,7 +54,7 @@ class PluginUpdate {
 			'requires_php'      => $data['meta']['requires_php'],
 			'screenshots'       => $this->get_plugin_images('screenshot', $slug),
 			'sections'          => [
-				'desctiption' => $data['content']['rendered'],
+				'description' => $data['content']['rendered'],
 				//'faq'            => 'frequently asked questions',
 				//'installation'   => 'installation',
 				//'screenshots'    => 'screenshots',
