@@ -14,7 +14,7 @@
 .cp-plugin-cards {
 	margin-bottom: 3em;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-gap: 3em;
 }
 
@@ -144,7 +144,7 @@
 
 @media (min-width: 783px) {
     .cp-plugin-cards {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
     .cp-plugin-actions .cp-plugin-installed {
 		height: unset;
@@ -153,12 +153,12 @@
 
 @media (min-width: 900px) {
     .cp-plugin-cards {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
     }
 }
 
 @media (min-width: 1024px) {
     .cp-plugin-cards {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
     }
 }
