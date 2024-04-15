@@ -6,7 +6,7 @@ Steps
 - [X] Create plugin update system that pulls from the directory
 - [X] Create plugin page
 - [X] Create theme update system that pulls from the directory
-- [ ] Create theme page
+- [X] Create theme page - done @ 0.1.4
 
 ## Plugin from the directory now can update as WP.org plugins.
 

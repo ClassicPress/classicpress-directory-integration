@@ -4,7 +4,7 @@
  * -----------------------------------------------------------------------------
  * Plugin Name:  ClassicPress Directory Integration
  * Description:  Install and update plugins from ClassicPress directory and keep ClassicPress themes updated.
- * Version:      0.1.3
+ * Version:      0.1.4
  * Author:       ClassicPress Contributors
  * Author URI:   https://www.classicpress.net
  * Plugin URI:   https://www.classicpress.net
@@ -43,6 +43,10 @@ $plugin_install = new PluginInstall();
 // Load Theme Update functionality class.
 require_once 'classes/ThemeUpdate.class.php';
 $theme_update = new ThemeUpdate();
+
+// Load Theme Install functionality class.
+require_once 'classes/ThemeInstall.class.php';
+$theme_install = new ThemeInstall();
 
 // Register text domain
 function register_text_domain() {
