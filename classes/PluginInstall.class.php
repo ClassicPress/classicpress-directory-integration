@@ -400,7 +400,7 @@ class PluginInstall
 										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'install', 'slug' => $slug]), 'install', '_cpdi')) . '" class="button install-now">' . esc_html__('Install', 'classicpress-directory-integration') . '</a>';
 									}
 									if (array_key_exists($slug, $local_cp_plugins) && $local_cp_plugins[$slug]['Active']) {
-										echo '<span class="cp-plugin-installed">' . esc_html__('Installed', 'classicpress-directory-integration') . '</span>';
+										echo '<span class="button cp-plugin-installed">' . esc_html__('Installed', 'classicpress-directory-integration') . '</span>';
 									}
 									if (array_key_exists($slug, $local_cp_plugins) && !$local_cp_plugins[$slug]['Active']) {
 										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate', 'slug' => $slug]), 'activate', '_cpdi')) . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
