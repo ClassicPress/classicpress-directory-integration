@@ -1,6 +1,20 @@
+.plugin-install-tab h1 {
+	margin-bottom: 1em;
+}
+
+.cp-plugin-search-box {
+	float: right;
+	margin: -5em 0 0;
+}
+
+.wp-filter-search {
+	width: 280px;
+}
+
 .cp-plugin-cards {
+	margin-bottom: 3em;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-gap: 3em;
 }
 
@@ -57,17 +71,21 @@
 }
 
 .cp-plugin-actions .button.link-txt {
-    border: none;
+    border: 1px solid transparent;
     box-shadow: none;
-    line-height: 28px;
+}
+
+.cp-plugin-actions .button:hover,
+.cp-plugin-actions .button:focus {
+	color: #fff;
+	background-color: #2271b1;
+	border-color: #185281;
 }
 
 .cp-plugin-actions .cp-plugin-installed {
     display: inline-block;
     text-decoration: none;
-    font-size: 13px;
-    line-height: 26px;
-    height: 28px;
+    height: 39px;
     margin: 0;
     padding: 0 10px 1px;
     border-radius: 3px;
@@ -98,9 +116,11 @@
     text-align: center;
     text-decoration: none;
     color: #666;
+    margin-right: 5px;
 }
 
-.cp-plugins-pagination li a:hover {
+.cp-plugins-pagination li a:hover,
+.cp-plugins-pagination li a:focus {
     border-color: #5b9dd9;
     color: #fff;
     background: #00a0d2;
@@ -122,14 +142,23 @@
     margin-left: -1px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 783px) {
     .cp-plugin-cards {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .cp-plugin-actions .cp-plugin-installed {
+		height: unset;
     }
 }
 
 @media (min-width: 1024px) {
     .cp-plugin-cards {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    }
+}
+
+@media (min-width: 1400px) {
+    .cp-plugin-cards {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
     }
 }
