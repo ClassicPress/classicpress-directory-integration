@@ -356,7 +356,7 @@ class PluginInstall
 ?>
 
 		<div class="wrap plugin-install-tab">
-			<h1 class="wp-heading-inline"><?php esc_html__('Plugins', 'classicpress-directory-integration'); ?></h1>
+			<h1 class="wp-heading-inline"><?php echo esc_html__('Plugins', 'classicpress-directory-integration'); ?></h1>
 			<hr class="wp-header-end">
 
 			<div class="cp-plugins-page">
@@ -364,16 +364,18 @@ class PluginInstall
 				<!-- Search form -->
 				<div class="cp-plugin-search-form">
 					<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-plugin-install'], remove_query_arg(['getpage']))); ?>">
-						<label for="searchfor"><?php echo esc_html__('Search', 'classicpress-directory-integration'); ?></label><br>
-						<input type="text" id="searchfor" name="searchfor" placeholder="<?php echo esc_html__('Search a plugin...', 'classicpress-directory-integration'); ?>"><br>
-						<?php
-						foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-							if (in_array($key, ['searchfor'])) {
-								continue;
+						<p class="cp-plugin-search-box">
+							<label for="searchfor" class="screen-reader-text" ><?php echo esc_html__('Search for plugins', 'classicpress-directory-integration'); ?></label><br>
+							<input type="text" id="searchfor" name="searchfor" class="wp-filter-search" placeholder="<?php echo esc_html__('Search for a plugin...', 'classicpress-directory-integration'); ?>"><br>
+							<?php
+							foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+								if (in_array($key, ['searchfor'])) {
+									continue;
+								}
+								echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
 							}
-							echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
-						}
-						?>
+							?>
+						</p>
 					</form>
 				</div>
 				<div class="cp-plugin-cards">
@@ -398,7 +400,7 @@ class PluginInstall
 										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'install', 'slug' => $slug]), 'install', '_cpdi')) . '" class="button install-now">' . esc_html__('Install', 'classicpress-directory-integration') . '</a>';
 									}
 									if (array_key_exists($slug, $local_cp_plugins) && $local_cp_plugins[$slug]['Active']) {
-										echo '<span class="cp-plugin-installed">' . esc_html__('Installed', 'classicpress-directory-integration') . '</span>';
+										echo '<span class="button cp-plugin-installed">' . esc_html__('Installed', 'classicpress-directory-integration') . '</span>';
 									}
 									if (array_key_exists($slug, $local_cp_plugins) && !$local_cp_plugins[$slug]['Active']) {
 										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate', 'slug' => $slug]), 'activate', '_cpdi')) . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
@@ -412,7 +414,6 @@ class PluginInstall
 					?>
 				</div>
 
-				<hr>
 				<nav aria-label="<?php esc_attr_e('Plugin search results navigation', 'classicpress-directory-integration'); ?>">
 					<ul class="cp-plugins-pagination">
 						<?php

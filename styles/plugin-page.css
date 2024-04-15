@@ -151,13 +151,13 @@
     }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
     .cp-plugin-cards {
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
     }
 }
 
-@media (min-width: 1400px) {
+@media (min-width: 1024px) {
     .cp-plugin-cards {
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
     }
