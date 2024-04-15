@@ -85,9 +85,9 @@
 .cp-plugin-actions .cp-plugin-installed {
     display: inline-block;
     text-decoration: none;
-    font-size: 13px;
-    line-height: 26px;
-    height: 28px;
+    font-size: 14px;
+    line-height: 2.71428571;
+    height: 39px;
     margin: 0;
     padding: 0 10px 1px;
     border-radius: 3px;
@@ -144,10 +144,14 @@
     margin-left: -1px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 783px) {
     .cp-plugin-cards {
         grid-template-columns: repeat(2, 1fr);
     }
+    .cp-plugin-actions .cp-plugin-installed {
+		font-size: 13px;
+		line-height: 26px;
+	}
 }
 
 @media (min-width: 1024px) {
