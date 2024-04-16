@@ -286,7 +286,7 @@ class PluginInstall
 		$response = $this->do_directory_request($args, 'plugins');
 		if (!$response['success'] || !isset($response['response'][0]['meta']['download_link'])) {
 			// Translators: %1$s is the plugin name.
-			$message = sprintf(esc_html__('API error.', 'classicpress-directory-integration'), $local_cp_plugins[$slug]['Name']);
+			$message = sprintf(esc_html__('API error for plugin %1$s.', 'classicpress-directory-integration'), $local_cp_plugins[$slug]['Name']);
 			$this->add_notice($message, true);
 			$sendback = remove_query_arg(['action', 'slug', '_cpdi'], wp_get_referer());
 			wp_safe_redirect($sendback);

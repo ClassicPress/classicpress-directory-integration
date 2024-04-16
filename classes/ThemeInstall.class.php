@@ -272,7 +272,7 @@ class ThemeInstall
 
 		if (!$response['success'] || !isset($response['response'][0]['meta']['download_link'])) {
 			// Translators: %1$s is the theme name.
-			$message = sprintf(esc_html__('API error.', 'classicpress-directory-integration'), $local_cp_themes[$slug]['Name']);
+			$message = sprintf(esc_html__('API error for theme %1$s.', 'classicpress-directory-integration'), $local_cp_themes[$slug]['Name']);
 			$this->add_notice($message, true);
 			$sendback = remove_query_arg(['action', 'slug', '_cpdi'], wp_get_referer());
 			wp_safe_redirect($sendback);
