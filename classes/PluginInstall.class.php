@@ -68,8 +68,8 @@ class PluginInstall
 
 	// Get all installed ClassicPress plugin
 	// This function is different from the one in PluginUpdate class
-	// and considers a plugin from the dir not only if it has RequiresCP
-	// but also if it have RequiresCP.
+	// and considers a plugin from the dir not only if it has UpdateURI
+	// but also if it has RequiresCP.
 	private function get_local_cp_plugins()
 	{
 
