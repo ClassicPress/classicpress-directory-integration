@@ -44,6 +44,10 @@ $plugin_install = new PluginInstall();
 require_once 'classes/ThemeUpdate.class.php';
 $theme_update = new ThemeUpdate();
 
+// Load Theme Install functionality class.
+require_once 'classes/ThemeInstall.class.php';
+$theme_install = new ThemeInstall();
+
 // Register text domain
 function register_text_domain() {
 	load_plugin_textdomain('classicpress-directory-integration', false, dirname(plugin_basename(__FILE__)).'/languages');

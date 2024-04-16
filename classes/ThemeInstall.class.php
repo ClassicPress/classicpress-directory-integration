@@ -4,20 +4,19 @@ namespace ClassicPress\Directory;
 
 require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
-class PluginInstall
+class ThemeInstall
 {
 
-	private $local_cp_plugins = false;
+	private $local_cp_themes = false;
 
 	private $page = null;
 
 	public function __construct()
 	{
-		// Add menu under plugins.
+		// Add menu under Appearance.
 		add_action('admin_menu', [$this, 'create_menu'], 100);
 		add_action('admin_enqueue_scripts', [$this, 'styles']);
 		add_action('admin_enqueue_scripts', [$this, 'scripts']);
-		add_action('admin_menu', [$this, 'rename_menu']);
 	}
 
 	public function styles($hook)
@@ -25,7 +24,7 @@ class PluginInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_style('classicpress-directory-integration-css-plugin', plugins_url('../styles/plugin-page.css', __FILE__), []);
+		wp_enqueue_style('classicpress-directory-integration-css-theme', plugins_url('../styles/theme-page.css', __FILE__), []);
 	}
 
 	public function scripts($hook)
@@ -33,7 +32,7 @@ class PluginInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_script('classicpress-directory-integration-js-plugin', plugins_url('../scripts/plugin-page.js', __FILE__), ['jquery'], false, true);
+		wp_enqueue_script('classicpress-directory-integration-js-theme', plugins_url('../scripts/theme-page.js', __FILE__), ['jquery'], false, true);
 	}
 
 	public function create_menu()
@@ -43,11 +42,11 @@ class PluginInstall
 		}
 
 		$this->page = add_submenu_page(
-			'plugins.php',
-			esc_html__('Install ClassicPress Plugins', 'classicpress-directory-integration'),
-			esc_html__('Install CP Plugins', 'classicpress-directory-integration'),
-			'install_plugins',
-			'classicpress-directory-integration-plugin-install',
+			'themes.php',
+			esc_html__('ClassicPress Themes', 'classicpress-directory-integration'),
+			esc_html__('CP Themes', 'classicpress-directory-integration'),
+			'install_themes',
+			'classicpress-directory-integration-theme-install',
 			[$this, 'render_menu'],
 			2
 		);
@@ -56,47 +55,31 @@ class PluginInstall
 		add_action('load-' . $this->page, [$this, 'install_action']);
 	}
 
-	public function rename_menu() {
-		global $submenu;
-		foreach ( $submenu['plugins.php'] as $key => $value ) {
-			if($value[2] !== 'plugin-install.php') {
-				continue;
-			}
-			$submenu['plugins.php'][$key][0] = esc_html__('Install WP Plugins', 'classicpress-directory-integration'); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-		}
-	}
-
-	// Get all installed ClassicPress plugin
-	// This function is different from the one in PluginUpdate class
-	// and considers a plugin from the dir not only if it has UpdateURI
-	// but also if it has RequiresCP.
-	private function get_local_cp_plugins()
+	// Get all installed ClassicPress Themes
+	// This function is different from the one in ThemeUpdate class
+	// and considers a theme from the dir not only if it has UpdateURI
+	// but also if it have RequiresCP.
+	private function get_local_cp_themes()
 	{
 
-		if ($this->local_cp_plugins !== false) {
-			return $this->local_cp_plugins;
+		if ($this->local_cp_themes !== false) {
+			return $this->local_cp_themes;
 		}
 
-		$all_plugins = get_plugins();
-		$cp_plugins  = [];
-		foreach ($all_plugins as $slug => $plugin) {
-			if (!array_key_exists('UpdateURI', $plugin) && !array_key_exists('RequiresCP', $plugin)) {
-				continue;
-			}
-			if (strpos($plugin['UpdateURI'], \CLASSICPRESS_DIRECTORY_INTEGRATION_URL) !== 0 && !array_key_exists('RequiresCP', $plugin)) {
-				continue;
-			}
-			$cp_plugins[dirname($slug)] = [
+		$all_themes = wp_get_themes();
+		$cp_themes  = [];
+		foreach($all_themes as $slug => $inner){
+			$cp_themes[($slug)] = [
 				'WPSlug'      => $slug,
-				'Name'        => $plugin['Name'],
-				'Version'     => $plugin['Version'],
-				'PluginURI'   => array_key_exists('PluginURI', $plugin) ? $plugin['PluginURI'] : null,
-				'Active'      => is_plugin_active($slug),
+				'Name'        => $inner->get( 'Name' ),
+				'Version'     => $inner->get( 'Version' ),
+				'ThemeURI'    => $inner->get( 'ThemeURI' ),
+				'Active'      => get_template(),
 			];
 		}
+		$this->local_cp_themes = $cp_themes;
+		return $this->local_cp_themes;
 
-		$this->local_cp_plugins = $cp_plugins;
-		return $this->local_cp_plugins;
 	}
 
 	// Validate and sanitize args for quering the ClassicPress Directory
@@ -132,11 +115,11 @@ class PluginInstall
 	}
 
 	// Query the ClassicPress Directory
-	public static function do_directory_request($args = [], $type = 'plugins')
+	public static function do_directory_request($args = [], $type = 'themes')
 	{
 		$result['success'] = false;
 
-		if (!in_array($type, ['plugins', 'themes'])) {
+		if (!in_array($type, ['themes', 'themes'])) {
 			$result['error'] = $type . ' is not a supported type';
 			return $result;
 		}
@@ -212,8 +195,8 @@ class PluginInstall
 	public function activate_action()
 	{
 
-		// Load local plugins information
-		$local_cp_plugins = $this->get_local_cp_plugins();
+		// Load local themes information
+		$local_cp_themes = $this->get_local_cp_themes();
 
 		// Security checks
 		if (!isset($_GET['action'])) {
@@ -225,28 +208,30 @@ class PluginInstall
 		if (!check_admin_referer('activate', '_cpdi')) {
 			return;
 		}
-		if (!current_user_can('activate_plugins')) {
+		if (!current_user_can('install_themes')) {
 			return;
 		}
 		if (!isset($_REQUEST['slug'])) {
 			return;
 		}
-		// Check if plugin slug is proper
+
+		// Check if theme slug is proper
 		$slug = sanitize_key(wp_unslash($_REQUEST['slug']));
-		if (!array_key_exists($slug, $local_cp_plugins)) {
+
+		if (!array_key_exists($slug, $local_cp_themes)) {
 			return;
 		}
 
-		// Activate plugin
-		$result = activate_plugin($local_cp_plugins[$slug]['WPSlug']);
+		// Activate Theme
+		$result = switch_theme($local_cp_themes[$slug]['WPSlug']);
 
 		if ($result !== null) {
-			// Translators: %1$s is the plugin name.
-			$message = sprintf(esc_html__('Error activating %1$s.', 'classicpress-directory-integration'), $local_cp_plugins[$slug]['Name']);
+			// Translators: %1$s is the theme name.
+			$message = sprintf(esc_html__('Error activating %1$s.', 'classicpress-directory-integration'), $local_cp_themes[$slug]['Name']);
 			$this->add_notice($message, true);
 		} else {
-			// Translators: %1$s is the plugin name.
-			$message = sprintf(esc_html__('%1$s activated.', 'classicpress-directory-integration'), $local_cp_plugins[$slug]['Name']);
+			// Translators: %1$s is the theme name.
+			$message = sprintf(esc_html__('%1$s activated.', 'classicpress-directory-integration'), $local_cp_themes[$slug]['Name']);
 			$this->add_notice($message, false);
 		}
 
@@ -269,13 +254,13 @@ class PluginInstall
 		if (!check_admin_referer('install', '_cpdi')) {
 			return;
 		}
-		if (!current_user_can('install_plugins')) {
+		if (!current_user_can('install_themes')) {
 			return;
 		}
 		if (!isset($_REQUEST['slug'])) {
 			return;
 		}
-		// Check if plugin slug is proper
+		// Check if theme slug is proper
 		$slug = sanitize_key(wp_unslash($_REQUEST['slug']));
 
 		// Get github release file
@@ -283,10 +268,11 @@ class PluginInstall
 			'byslug'  => $slug,
 			'_fields' => 'meta,title',
 		];
-		$response = $this->do_directory_request($args, 'plugins');
+		$response = $this->do_directory_request($args, 'themes');
+
 		if (!$response['success'] || !isset($response['response'][0]['meta']['download_link'])) {
-			// Translators: %1$s is the plugin name.
-			$message = sprintf(esc_html__('API error for plugin %1$s.', 'classicpress-directory-integration'), $local_cp_plugins[$slug]['Name']);
+			// Translators: %1$s is the theme name.
+			$message = sprintf(esc_html__('API error for theme %1$s.', 'classicpress-directory-integration'), $local_cp_themes[$slug]['Name']);
 			$this->add_notice($message, true);
 			$sendback = remove_query_arg(['action', 'slug', '_cpdi'], wp_get_referer());
 			wp_safe_redirect($sendback);
@@ -294,20 +280,20 @@ class PluginInstall
 		}
 
 		$installation_url = $response['response'][0]['meta']['download_link'];
-		$plugin_name      = $response['response'][0]['title']['rendered'];
+		$theme_name      = $response['response'][0]['title']['rendered'];
 
-		// Install plugin
-		$skin     = new PluginInstallSkin(['type'  => 'plugin']);
-		$upgrader = new \Plugin_Upgrader($skin);
+		// Install Theme
+		$skin     = new ThemeInstallSkin(['type'  => 'theme']);
+		$upgrader = new \Theme_Upgrader($skin);
 		$response = $upgrader->install($installation_url);
 
 		if ($response !== true) {
-			// Translators: %1$s is the plugin name.
-			$message = sprintf(esc_html__('Error installing %1$s.', 'classicpress-directory-integration'), $plugin_name);
+			// Translators: %1$s is the theme name.
+			$message = sprintf(esc_html__('Error installing %1$s.', 'classicpress-directory-integration'), $theme_name);
 			$this->add_notice($message, true);
 		} else {
-			// Translators: %1$s is the plugin name.
-			$message = sprintf(esc_html__('%1$s installed.', 'classicpress-directory-integration'), $plugin_name);
+			// Translators: %1$s is the theme name.
+			$message = sprintf(esc_html__('%1$s installed.', 'classicpress-directory-integration'), $theme_name);
 			$this->add_notice($message, false);
 		}
 
@@ -316,11 +302,11 @@ class PluginInstall
 		exit;
 	}
 
-	// Render "Install CP plugins" menu
+	// Render "CP Themes" menu
 	public function render_menu()
 	{ // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-		// Load local plugins information
-		$local_cp_plugins = $this->get_local_cp_plugins();
+		// Load local themes information
+		$local_cp_themes = $this->get_local_cp_themes();
 
 		// Set age number if empty
 		// We check nonces only on activations and installations.
@@ -344,11 +330,11 @@ class PluginInstall
 		}
 
 		// Set up variables
-		$plugins = $result['response'] ?? [];
+		$themes = $result['response'] ?? [];
 		$pages   = $result['total-pages'] ?? 0;
 
-		if ($plugins === []) {
-			$this->add_notice(esc_html__('No plugins found.', 'classicpress-directory-integration'), true);
+		if ($themes === []) {
+			$this->add_notice(esc_html__('No themes found.', 'classicpress-directory-integration'), true);
 		}
 
 		// Display notices
@@ -356,53 +342,51 @@ class PluginInstall
 ?>
 
 		<div class="wrap plugin-install-tab">
-			<h1 class="wp-heading-inline"><?php echo esc_html__('Plugins', 'classicpress-directory-integration'); ?></h1>
+			<h1 class="wp-heading-inline"><?php esc_html__('Themes', 'classicpress-directory-integration'); ?></h1>
 			<hr class="wp-header-end">
 
 			<div class="cp-plugins-page">
-				<h3 class="screen-reader-text"><?php echo esc_html__('Plugins list', 'classicpress-directory-integration'); ?></h3>
+				<h3 class="screen-reader-text"><?php echo esc_html__('Themes list', 'classicpress-directory-integration'); ?></h3>
 				<!-- Search form -->
 				<div class="cp-plugin-search-form">
-					<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-plugin-install'], remove_query_arg(['getpage']))); ?>">
-						<p class="cp-plugin-search-box">
-							<label for="searchfor" class="screen-reader-text" ><?php echo esc_html__('Search for plugins', 'classicpress-directory-integration'); ?></label><br>
-							<input type="text" id="searchfor" name="searchfor" class="wp-filter-search" placeholder="<?php echo esc_html__('Search for a plugin...', 'classicpress-directory-integration'); ?>"><br>
-							<?php
-							foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-								if (in_array($key, ['searchfor'])) {
-									continue;
-								}
-								echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
+					<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-theme-install'], remove_query_arg(['getpage']))); ?>">
+						<label for="searchfor"><?php echo esc_html__('Search', 'classicpress-directory-integration'); ?></label><br>
+						<input type="text" id="searchfor" name="searchfor" placeholder="<?php echo esc_html__('Search a theme...', 'classicpress-directory-integration'); ?>"><br>
+						<?php
+						foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+							if (in_array($key, ['searchfor'])) {
+								continue;
 							}
-							?>
-						</p>
+							echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
+						}
+						?>
 					</form>
 				</div>
 				<div class="cp-plugin-cards">
 					<?php
-					foreach ($plugins as $plugin) {
-						$slug = $plugin['meta']['slug'];
+					foreach ($themes as $theme) {
+						$slug = $theme['meta']['slug'];
 					?>
 						<article class="cp-plugin-card" id="cp-plugin-id-<?php echo esc_attr($slug); ?>">
 							<header class="cp-plugin-card-header">
-								<h3><?php echo esc_html($plugin['title']['rendered']); ?></h3>
-								<div class="cp-plugin-author"><?php echo wp_kses(sprintf(__('By <b>%1$s</b>.', 'classicpress-directory-integration'), $plugin['meta']['developer_name']), ['b' => []]); ?></div>
+								<h3><?php echo esc_html($theme['title']['rendered']); ?></h3>
+								<div class="cp-plugin-author"><?php echo wp_kses(sprintf(__('By <b>%1$s</b>.', 'classicpress-directory-integration'), $theme['meta']['developer_name']), ['b' => []]); ?></div>
 							</header>
 							<div class="cp-plugin-card-body">
-								<div class="cp-plugin-description"><?php echo wp_kses_post($plugin['excerpt']['rendered']); ?></div>
+								<div class="cp-plugin-description"><?php echo wp_kses_post($theme['excerpt']['rendered']); ?></div>
 							</div>
 							<footer class="cp-plugin-card-footer">
-								<div class="cp-plugin-installs"><?php echo esc_html($plugin['meta']['active_installations'] === '' ? 0 : $plugin['meta']['active_installations']) . esc_html__(' Active Installations', 'classicpress-directory-integration'); ?></div>
+								<div class="cp-plugin-installs"><?php echo esc_html($theme['meta']['active_installations'] === '' ? 0 : $theme['meta']['active_installations']) . esc_html__(' Active Installations', 'classicpress-directory-integration'); ?></div>
 								<div class="cp-plugin-actions">
-									<a href="https://directory.classicpress.net/plugins/<?php echo esc_attr( $slug ); ?>" target="_blank" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
+									<a href="https://directory.classicpress.net/themes/<?php echo esc_attr( $slug ); ?>" target="_blank" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
 									<?php
-									if (!array_key_exists($slug, $local_cp_plugins)) {
+									if (!array_key_exists($slug, $local_cp_themes)) {
 										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'install', 'slug' => $slug]), 'install', '_cpdi')) . '" class="button install-now">' . esc_html__('Install', 'classicpress-directory-integration') . '</a>';
 									}
-									if (array_key_exists($slug, $local_cp_plugins) && $local_cp_plugins[$slug]['Active']) {
-										echo '<span class="button cp-plugin-installed">' . esc_html__('Active', 'classicpress-directory-integration') . '</span>';
+									if ( array_key_exists($slug, $local_cp_themes) && ($local_cp_themes[$slug]['Active'] == $slug ) ) {
+										echo '<span class="cp-plugin-installed">' . esc_html__('Active', 'classicpress-directory-integration') . '</span>';
 									}
-									if (array_key_exists($slug, $local_cp_plugins) && !$local_cp_plugins[$slug]['Active']) {
+									if ( array_key_exists($slug, $local_cp_themes) && ($local_cp_themes[$slug]['Active'] != $slug ) ) {
 										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate', 'slug' => $slug]), 'activate', '_cpdi')) . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
 									}
 									?>
@@ -414,7 +398,8 @@ class PluginInstall
 					?>
 				</div>
 
-				<nav aria-label="<?php esc_attr_e('Plugin search results navigation', 'classicpress-directory-integration'); ?>">
+				<hr>
+				<nav aria-label="<?php esc_attr_e('theme search results navigation', 'classicpress-directory-integration'); ?>">
 					<ul class="cp-plugins-pagination">
 						<?php
 						for ($x = 1; $x <= $pages; $x++) {
@@ -435,7 +420,7 @@ class PluginInstall
 
 }
 
-class PluginInstallSkin extends \Plugin_Installer_Skin
+class ThemeInstallSkin extends \Theme_Installer_Skin
 {
 
 	public function header()
