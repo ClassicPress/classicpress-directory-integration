@@ -80,18 +80,15 @@ class ThemeInstall
 		$all_themes = wp_get_themes();
 		$cp_themes  = [];
 		foreach($all_themes as $slug => $inner){
-			//$cp_themes[dirname($slug)] = [
 			$cp_themes[($slug)] = [
 				'WPSlug'      => $slug,
 				'Name'        => $inner->get( 'Name' ),
 				'Version'     => $inner->get( 'Version' ),
 				'ThemeURI'    => $inner->get( 'ThemeURI' ),
 				'Active'      => get_template(),
-			//	'Active'      => $inner->get( 'Status' ),
 			];
 		}
 		$this->local_cp_themes = $cp_themes;
-		//var_dump($this->local_cp_themes);
 		return $this->local_cp_themes;
 
 	}
@@ -222,20 +219,22 @@ class ThemeInstall
 		if (!check_admin_referer('activate', '_cpdi')) {
 			return;
 		}
-		if (!current_user_can('activate_themes')) {
+		if (!current_user_can('install_themes')) {
 			return;
 		}
 		if (!isset($_REQUEST['slug'])) {
 			return;
 		}
+
 		// Check if theme slug is proper
 		$slug = sanitize_key(wp_unslash($_REQUEST['slug']));
+
 		if (!array_key_exists($slug, $local_cp_themes)) {
 			return;
 		}
 
 		// Activate Theme
-		$result = activate_theme($local_cp_themes[$slug]['WPSlug']);
+		$result = switch_theme($local_cp_themes[$slug]['WPSlug']);
 
 		if ($result !== null) {
 			// Translators: %1$s is the theme name.
@@ -281,6 +280,7 @@ class ThemeInstall
 			'_fields' => 'meta,title',
 		];
 		$response = $this->do_directory_request($args, 'themes');
+
 		if (!$response['success'] || !isset($response['response'][0]['meta']['download_link'])) {
 			// Translators: %1$s is the theme name.
 			$message = sprintf(esc_html__('API error.', 'classicpress-directory-integration'), $local_cp_themes[$slug]['Name']);
@@ -398,11 +398,7 @@ class ThemeInstall
 										echo '<span class="cp-plugin-installed">' . esc_html__('Active', 'classicpress-directory-integration') . '</span>';
 									}
 									if ( array_key_exists($slug, $local_cp_themes) && ($local_cp_themes[$slug]['Active'] != $slug ) ) {
-										/* This not working
-										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate', 'stylesheet' => $slug]), 'activate', '_cpdi')) . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
-										// The below is temp patch
-										*/
-										echo '<a href="' . home_url() . '/wp-admin/themes.php' . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
+										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate', 'slug' => $slug]), 'activate', '_cpdi')) . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
 									}
 									?>
 								</div>
