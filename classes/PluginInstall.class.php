@@ -44,7 +44,7 @@ class PluginInstall
 
 		$this->page = add_submenu_page(
 			'plugins.php',
-			esc_html__('Install ClassicPress plugins', 'classicpress-directory-integration'),
+			esc_html__('Install ClassicPress Plugins', 'classicpress-directory-integration'),
 			esc_html__('Install CP Plugins', 'classicpress-directory-integration'),
 			'install_plugins',
 			'classicpress-directory-integration-plugin-install',
@@ -68,7 +68,7 @@ class PluginInstall
 
 	// Get all installed ClassicPress plugin
 	// This function is different from the one in PluginUpdate class
-	// and considers a plugin from the dir not only if it has UpdateURI
+	// and considers a plugin from the dir not only if it has RequiresCP
 	// but also if it have RequiresCP.
 	private function get_local_cp_plugins()
 	{
