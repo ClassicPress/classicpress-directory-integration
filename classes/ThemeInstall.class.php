@@ -17,7 +17,6 @@ class ThemeInstall
 		add_action('admin_menu', [$this, 'create_menu'], 100);
 		add_action('admin_enqueue_scripts', [$this, 'styles']);
 		add_action('admin_enqueue_scripts', [$this, 'scripts']);
-		add_action('admin_menu', [$this, 'rename_menu']);
 	}
 
 	public function styles($hook)
@@ -54,16 +53,6 @@ class ThemeInstall
 
 		add_action('load-' . $this->page, [$this, 'activate_action']);
 		add_action('load-' . $this->page, [$this, 'install_action']);
-	}
-
-	public function rename_menu() {
-		global $submenu;
-		foreach ( $submenu['themes.php'] as $key => $value ) {
-			if($value[2] !== 'themes.php') {
-				continue;
-			}
-			$submenu['themes.php'][$key][0] = esc_html__('WP Themes', 'classicpress-directory-integration'); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-		}
 	}
 
 	// Get all installed ClassicPress Themes
