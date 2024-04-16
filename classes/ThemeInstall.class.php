@@ -24,7 +24,7 @@ class ThemeInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_style('classicpress-directory-integration-css', plugins_url('../styles/plugin-page.css', __FILE__), []);
+		wp_enqueue_style('classicpress-directory-integration-css-theme', plugins_url('../styles/theme-page.css', __FILE__), []);
 	}
 
 	public function scripts($hook)
@@ -32,7 +32,7 @@ class ThemeInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_script('classicpress-directory-integration-js', plugins_url('../scripts/plugin-page.js', __FILE__), ['jquery'], false, true);
+		wp_enqueue_script('classicpress-directory-integration-js-theme', plugins_url('../scripts/theme-page.js', __FILE__), ['jquery'], false, true);
 	}
 
 	public function create_menu()
