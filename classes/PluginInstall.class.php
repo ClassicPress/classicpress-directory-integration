@@ -25,7 +25,7 @@ class PluginInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_style('classicpress-directory-integration-css', plugins_url('../styles/plugin-page.css', __FILE__), []);
+		wp_enqueue_style('classicpress-directory-integration-css-plugin', plugins_url('../styles/plugin-page.css', __FILE__), []);
 	}
 
 	public function scripts($hook)
@@ -33,7 +33,7 @@ class PluginInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_script( 'classicpress-directory-integration-js', plugins_url( '../scripts/plugin-page.js', __FILE__ ), array( 'wp-i18n' ), false, true );
+		wp_enqueue_script( 'classicpress-directory-integration-js-plugin', plugins_url( '../scripts/plugin-page.js', __FILE__ ), array( 'wp-i18n' ), false, true );
 		wp_set_script_translations( 'classicpress-directory-integration-js', 'classicpress-directory-integration', plugin_dir_path( 'classicpress-directory-integration' ) . 'languages' );
 	}
 
