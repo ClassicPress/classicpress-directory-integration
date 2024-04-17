@@ -34,7 +34,7 @@ class PluginInstall
 			return;
 		}
 		wp_enqueue_script( 'classicpress-directory-integration-js-plugin', plugins_url( '../scripts/plugin-page.js', __FILE__ ), array( 'wp-i18n' ), false, true );
-		wp_set_script_translations( 'classicpress-directory-integration-js', 'classicpress-directory-integration', plugin_dir_path( 'classicpress-directory-integration' ) . 'languages' );
+		wp_set_script_translations( 'classicpress-directory-integration-js-plugin', 'classicpress-directory-integration', plugin_dir_path( 'classicpress-directory-integration' ) . 'languages' );
 	}
 
 	public function create_menu()
