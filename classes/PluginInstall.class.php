@@ -395,7 +395,7 @@ class PluginInstall
 							<footer class="cp-plugin-card-footer" data-content="<?php echo esc_attr($plugin['content']['rendered']); ?>">
 								<div class="cp-plugin-installs"><?php echo esc_html($plugin['meta']['active_installations'] === '' ? 0 : $plugin['meta']['active_installations']) . esc_html__(' Active Installations', 'classicpress-directory-integration'); ?></div>
 								<div class="cp-plugin-actions">
-									<a href="<?php echo esc_url( admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . $slug . '&TB_iframe=true&width=600&height=550"' ) ); ?>" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
+									<a href="<?php echo esc_url( admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . $slug . '&width=600&height=550"' ) ); ?>" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
 									<?php
 									if (!array_key_exists($slug, $local_cp_plugins)) {
 										echo '<a href="' . esc_url(wp_nonce_url(add_query_arg(['action' => 'install', 'slug' => $slug]), 'install', '_cpdi')) . '" class="button install-now">' . esc_html__('Install', 'classicpress-directory-integration') . '</a>';
