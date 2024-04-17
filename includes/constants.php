@@ -16,5 +16,5 @@ if (!defined('ABSPATH')) {
 	die();
 }
 
-define ('CLASSICPRESS_DIRECTORY_INTEGRATION_VERSION', '0.1.1');
+define ('CLASSICPRESS_DIRECTORY_INTEGRATION_VERSION', '0.2.0');
 define ('CLASSICPRESS_DIRECTORY_INTEGRATION_URL', 'https://directory.classicpress.net/wp-json/wp/v2/');
