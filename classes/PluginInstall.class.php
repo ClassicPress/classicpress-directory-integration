@@ -33,7 +33,8 @@ class PluginInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_script('classicpress-directory-integration-js-plugin', plugins_url('../scripts/plugin-page.js', __FILE__), ['jquery'], false, true);
+		wp_enqueue_script( 'classicpress-directory-integration-js-plugin', plugins_url( '../scripts/plugin-page.js', __FILE__ ), array( 'wp-i18n' ), false, true );
+		wp_set_script_translations( 'classicpress-directory-integration-js-plugin', 'classicpress-directory-integration', plugin_dir_path( 'classicpress-directory-integration' ) . 'languages' );
 	}
 
 	public function create_menu()
@@ -286,7 +287,7 @@ class PluginInstall
 		$response = $this->do_directory_request($args, 'plugins');
 		if (!$response['success'] || !isset($response['response'][0]['meta']['download_link'])) {
 			// Translators: %1$s is the plugin name.
-			$message = sprintf(esc_html__('API error for plugin %1$s.', 'classicpress-directory-integration'), $local_cp_plugins[$slug]['Name']);
+			$message = sprintf(esc_html__('API error.', 'classicpress-directory-integration'), $local_cp_plugins[$slug]['Name']);
 			$this->add_notice($message, true);
 			$sendback = remove_query_arg(['action', 'slug', '_cpdi'], wp_get_referer());
 			wp_safe_redirect($sendback);
@@ -360,7 +361,7 @@ class PluginInstall
 			<hr class="wp-header-end">
 
 			<div class="cp-plugins-page">
-				<h3 class="screen-reader-text"><?php echo esc_html__('Plugins list', 'classicpress-directory-integration'); ?></h3>
+				<h2 class="screen-reader-text"><?php echo esc_html__('Plugins list', 'classicpress-directory-integration'); ?></h2>
 				<!-- Search form -->
 				<div class="cp-plugin-search-form">
 					<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-plugin-install'], remove_query_arg(['getpage']))); ?>">
@@ -380,8 +381,13 @@ class PluginInstall
 				</div>
 				<div class="cp-plugin-cards">
 					<?php
-					foreach ($plugins as $plugin) {
+					foreach ( $plugins as $plugin ) {
 						$slug = $plugin['meta']['slug'];
+						$content = $plugin['content']['rendered'];
+						$markdown_contents = cp_get_markdown_plugin_contents( $content, '<div class="markdown-heading">', '</div>' );
+						foreach ( $markdown_contents as $markdown_content ) {
+							$content = str_replace( '<div class="markdown-heading">' . $markdown_content . '</div>', $markdown_content, $content );
+						}
 					?>
 						<article class="cp-plugin-card" id="cp-plugin-id-<?php echo esc_attr($slug); ?>">
 							<header class="cp-plugin-card-header">
@@ -391,19 +397,19 @@ class PluginInstall
 							<div class="cp-plugin-card-body">
 								<div class="cp-plugin-description"><?php echo wp_kses_post($plugin['excerpt']['rendered']); ?></div>
 							</div>
-							<footer class="cp-plugin-card-footer">
+							<footer class="cp-plugin-card-footer" data-content="<?php echo esc_attr( $content ); ?>">
 								<div class="cp-plugin-installs"><?php echo esc_html($plugin['meta']['active_installations'] === '' ? 0 : $plugin['meta']['active_installations']) . esc_html__(' Active Installations', 'classicpress-directory-integration'); ?></div>
 								<div class="cp-plugin-actions">
-									<a href="https://directory.classicpress.net/plugins/<?php echo esc_attr( $slug ); ?>" target="_blank" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
+									<a href="<?php echo esc_url( admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . $slug ) ); ?>" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
 									<?php
 									if (!array_key_exists($slug, $local_cp_plugins)) {
-										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'install', 'slug' => $slug]), 'install', '_cpdi')) . '" class="button install-now">' . esc_html__('Install', 'classicpress-directory-integration') . '</a>';
+										echo '<a href="' . esc_url(wp_nonce_url(add_query_arg(['action' => 'install', 'slug' => $slug]), 'install', '_cpdi')) . '" class="button install-now">' . esc_html__('Install', 'classicpress-directory-integration') . '</a>';
 									}
 									if (array_key_exists($slug, $local_cp_plugins) && $local_cp_plugins[$slug]['Active']) {
-										echo '<span class="button cp-plugin-installed">' . esc_html__('Active', 'classicpress-directory-integration') . '</span>';
+										echo '<span class="button cp-plugin-installed" tabindex="0">' . esc_html__('Active', 'classicpress-directory-integration') . '</span>';
 									}
 									if (array_key_exists($slug, $local_cp_plugins) && !$local_cp_plugins[$slug]['Active']) {
-										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate', 'slug' => $slug]), 'activate', '_cpdi')) . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
+										echo '<a href="' . esc_url(wp_nonce_url(add_query_arg(['action' => 'activate', 'slug' => $slug]), 'activate', '_cpdi')) . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
 									}
 									?>
 								</div>
@@ -419,7 +425,7 @@ class PluginInstall
 						<?php
 						for ($x = 1; $x <= $pages; $x++) {
 							$current_page = ($x == $page) ? ' cp-current-page" aria-current="page' : '';
-							$link = '<a href="' . esc_url_raw(add_query_arg(['getpage' => $x], remove_query_arg('getpage'))) . '">' . (int)$x . '</a>';
+							$link = '<a href="' . esc_url(add_query_arg(['getpage' => $x], remove_query_arg('getpage'))) . '">' . (int)$x . '</a>';
 							echo '<li class="cp-search-page-item' . wp_kses_post($current_page) . '">' . wp_kses_post($link) . '</li>';
 						}
 						?>
@@ -453,4 +459,32 @@ class PluginInstallSkin extends \Plugin_Installer_Skin
 	public function feedback($string, ...$args)
 	{
 	}
+}
+
+/**
+ * Get all substrings within text that are found between two other, specified strings
+ *
+ * Avoids parsing HTML with regex
+ *
+ * Returns an array
+ *
+ * See https://stackoverflow.com/a/27078384
+ */
+function cp_get_markdown_plugin_contents( $str, $startDelimiter, $endDelimiter ) {
+	$contents = [];
+	$startDelimiterLength = strlen( $startDelimiter );
+	$endDelimiterLength = strlen( $endDelimiter );
+	$startFrom = $contentStart = $contentEnd = 0;
+
+	while ( $contentStart = strpos( $str, $startDelimiter, $startFrom ) ) {
+		$contentStart += $startDelimiterLength;
+		$contentEnd = strpos( $str, $endDelimiter, $contentStart );
+		if ( $contentEnd === false ) {
+			break;
+		}
+		$contents[] = substr( $str, $contentStart, $contentEnd - $contentStart );
+		$startFrom = $contentEnd + $endDelimiterLength;
+	}
+
+	return $contents;
 }
