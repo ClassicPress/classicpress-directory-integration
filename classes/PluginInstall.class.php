@@ -381,8 +381,13 @@ class PluginInstall
 				</div>
 				<div class="cp-plugin-cards">
 					<?php
-					foreach ($plugins as $plugin) {
+					foreach ( $plugins as $plugin ) {
 						$slug = $plugin['meta']['slug'];
+						$content = $plugin['content']['rendered'];
+						$markdown_contents = cp_get_markdown_plugin_contents( $content, '<div class="markdown-heading">', '</div>' );
+						foreach ( $markdown_contents as $markdown_content ) {
+							$content = str_replace( '<div class="markdown-heading">' . $markdown_content . '</div>', $markdown_content, $content );
+						}
 					?>
 						<article class="cp-plugin-card" id="cp-plugin-id-<?php echo esc_attr($slug); ?>">
 							<header class="cp-plugin-card-header">
@@ -392,7 +397,7 @@ class PluginInstall
 							<div class="cp-plugin-card-body">
 								<div class="cp-plugin-description"><?php echo wp_kses_post($plugin['excerpt']['rendered']); ?></div>
 							</div>
-							<footer class="cp-plugin-card-footer" data-content="<?php echo esc_attr($plugin['content']['rendered']); ?>">
+							<footer class="cp-plugin-card-footer" data-content="<?php echo esc_attr( $content ); ?>">
 								<div class="cp-plugin-installs"><?php echo esc_html($plugin['meta']['active_installations'] === '' ? 0 : $plugin['meta']['active_installations']) . esc_html__(' Active Installations', 'classicpress-directory-integration'); ?></div>
 								<div class="cp-plugin-actions">
 									<a href="<?php echo esc_url( admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . $slug ) ); ?>" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
@@ -454,4 +459,32 @@ class PluginInstallSkin extends \Plugin_Installer_Skin
 	public function feedback($string, ...$args)
 	{
 	}
+}
+
+/**
+ * Get all substrings within text that are found between two other, specified strings
+ *
+ * Avoids parsing HTML with regex
+ *
+ * Returns an array
+ *
+ * See https://stackoverflow.com/a/27078384
+ */
+function cp_get_markdown_plugin_contents( $str, $startDelimiter, $endDelimiter ) {
+	$contents = [];
+	$startDelimiterLength = strlen( $startDelimiter );
+	$endDelimiterLength = strlen( $endDelimiter );
+	$startFrom = $contentStart = $contentEnd = 0;
+
+	while ( $contentStart = strpos( $str, $startDelimiter, $startFrom ) ) {
+		$contentStart += $startDelimiterLength;
+		$contentEnd = strpos( $str, $endDelimiter, $contentStart );
+		if ( $contentEnd === false ) {
+			break;
+		}
+		$contents[] = substr( $str, $contentStart, $contentEnd - $contentStart );
+		$startFrom = $contentEnd + $endDelimiterLength;
+	}
+
+	return $contents;
 }
