@@ -24,7 +24,7 @@ class ThemeInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_style('classicpress-directory-integration-css-theme', plugins_url('../styles/theme-page.css', __FILE__), []);
+		wp_enqueue_style( 'classicpress-directory-integration-css', plugins_url( '../styles/directory-integration.css', __FILE__ ), [] );
 	}
 
 	public function scripts($hook)
@@ -32,8 +32,8 @@ class ThemeInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_script('classicpress-directory-integration-js-theme', plugins_url('../scripts/theme-page.js', __FILE__), array( 'wp-i18n' ), false, true);
-		wp_set_script_translations( 'classicpress-directory-integration-js-theme', 'classicpress-directory-integration', plugin_dir_path( 'classicpress-directory-integration' ) . 'languages' );
+		wp_enqueue_script( 'classicpress-directory-integration-js', plugins_url( '../scripts/directory-integration.js', __FILE__ ), array( 'wp-i18n' ), false, true );
+		wp_set_script_translations( 'classicpress-directory-integration-js', 'classicpress-directory-integration', plugin_dir_path( 'classicpress-directory-integration' ) . 'languages' );
 	}
 
 	public function create_menu()
@@ -344,27 +344,28 @@ class ThemeInstall
 
 		<div class="wrap plugin-install-tab">
 			<h1 class="wp-heading-inline"><?php echo esc_html__('Themes', 'classicpress-directory-integration'); ?></h1>
+			<h2 class="screen-reader-text"><?php echo esc_html__('Themes list', 'classicpress-directory-integration'); ?></h2>
+
+			<!-- Search form -->
+			<div class="cp-plugin-search-form">
+				<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-theme-install'], remove_query_arg(['getpage']))); ?>">
+					<p class="cp-plugin-search-box">
+						<label for="searchfor" class="screen-reader-text"><?php echo esc_html__('Search for a theme', 'classicpress-directory-integration'); ?></label><br>
+						<input type="text" id="searchfor" name="searchfor" class="wp-filter-search" placeholder="<?php echo esc_html__('Search for a theme...', 'classicpress-directory-integration'); ?>"><br>
+						<?php
+						foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+							if (in_array($key, ['searchfor'])) {
+								continue;
+							}
+							echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
+						}
+						?>
+					</p>
+				</form>
+			</div>
 			<hr class="wp-header-end">
 
 			<div class="cp-plugins-page">
-				<h2 class="screen-reader-text"><?php echo esc_html__('Themes list', 'classicpress-directory-integration'); ?></h2>
-				<!-- Search form -->
-				<div class="cp-plugin-search-form">
-					<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-theme-install'], remove_query_arg(['getpage']))); ?>">
-						<p class="cp-plugin-search-box">
-							<label for="searchfor" class="screen-reader-text"><?php echo esc_html__('Search for a theme', 'classicpress-directory-integration'); ?></label><br>
-							<input type="text" id="searchfor" name="searchfor" class="wp-filter-search" placeholder="<?php echo esc_html__('Search for a theme...', 'classicpress-directory-integration'); ?>"><br>
-							<?php
-							foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-								if (in_array($key, ['searchfor'])) {
-									continue;
-								}
-								echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
-							}
-							?>
-						</p>
-					</form>
-				</div>
 				<div class="cp-plugin-cards">
 					<?php
 					foreach ($themes as $theme) {
