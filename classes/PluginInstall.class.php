@@ -384,7 +384,7 @@ class PluginInstall
 					foreach ( $plugins as $plugin ) {
 						$slug = $plugin['meta']['slug'];
 						$content = $plugin['content']['rendered'];
-						$markdown_contents = cp_get_markdown_plugin_contents( $content, '<div class="markdown-heading">', '</div>' );
+						$markdown_contents = cp_get_markdown_contents( $content, '<div class="markdown-heading">', '</div>' );
 						foreach ( $markdown_contents as $markdown_content ) {
 							$content = str_replace( '<div class="markdown-heading">' . $markdown_content . '</div>', $markdown_content, $content );
 						}
@@ -470,7 +470,7 @@ class PluginInstallSkin extends \Plugin_Installer_Skin
  *
  * See https://stackoverflow.com/a/27078384
  */
-function cp_get_markdown_plugin_contents( $str, $startDelimiter, $endDelimiter ) {
+function cp_get_markdown_contents( $str, $startDelimiter, $endDelimiter ) {
 	$contents = [];
 	$startDelimiterLength = strlen( $startDelimiter );
 	$endDelimiterLength = strlen( $endDelimiter );
