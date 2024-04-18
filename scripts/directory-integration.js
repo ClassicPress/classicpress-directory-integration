@@ -1,5 +1,5 @@
 /**
- * @file Functionality for the ClassicPress plugin install screens.
+ * @file Functionality for the ClassicPress install screens.
  */
 document.addEventListener( 'DOMContentLoaded', function() {
 

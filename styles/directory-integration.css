@@ -76,7 +76,9 @@
 }
 
 .cp-plugin-actions .button:hover,
-.cp-plugin-actions .button:focus {
+.cp-plugin-actions .button:focus,
+#plugin-install-from-modal.button:hover,
+#plugin-install-from-modal.button:focus {
 	color: #fff;
 	background-color: #2271b1;
 	border-color: #185281;
@@ -140,6 +142,54 @@
 
 .cp-plugins-pagination li:not(:first-child) a {
     margin-left: -1px;
+}
+
+#plugin-information {
+	max-width: 800px;
+	margin: auto;
+	border: 2px solid #000;
+}
+
+#plugin-information-scrollable {
+	padding: 0 1.5em;
+}
+
+#plugin-information-scrollable h2 {
+	font-size: 2em;
+}
+
+#plugin-information-scrollable h4 {
+	font-size: 1.2em;
+}
+
+#plugin-information-scrollable h5 {
+	font-size: 1.1em;
+}
+
+#plugin-information-scrollable h6 {
+	font-size: 1.05em;
+}
+
+.plugin-details-modal #dialog-close-button {
+	border-left: 2px solid #000;
+	border-bottom: 2px solid #000;
+}
+
+.plugin-details-modal #dialog-close-button:hover,
+.plugin-details-modal #dialog-close-button:focus {
+	background-color: #fafafa;
+}
+
+#plugin-install-from-modal {
+	float: right;
+	margin-top: -2px;
+}
+
+#plugin-information-footer .cp-plugin-installed {
+	color: #fff;
+	border: 1px solid #269126;
+	background-color: #269126;
+	cursor: unset;
 }
 
 @media (min-width: 783px) {

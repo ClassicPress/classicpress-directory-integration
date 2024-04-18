@@ -25,7 +25,7 @@ class PluginInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_style('classicpress-directory-integration-css-plugin', plugins_url('../styles/plugin-page.css', __FILE__), []);
+		wp_enqueue_style( 'classicpress-directory-integration-css', plugins_url( '../styles/directory-integration.css', __FILE__ ), []) ;
 	}
 
 	public function scripts($hook)
@@ -33,8 +33,8 @@ class PluginInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_script( 'classicpress-directory-integration-js-plugin', plugins_url( '../scripts/plugin-page.js', __FILE__ ), array( 'wp-i18n' ), false, true );
-		wp_set_script_translations( 'classicpress-directory-integration-js-plugin', 'classicpress-directory-integration', plugin_dir_path( 'classicpress-directory-integration' ) . 'languages' );
+		wp_enqueue_script( 'classicpress-directory-integration-js', plugins_url( '../scripts/directory-integration.js', __FILE__ ), array( 'wp-i18n' ), false, true );
+		wp_set_script_translations( 'classicpress-directory-integration-js', 'classicpress-directory-integration', plugin_dir_path( 'classicpress-directory-integration' ) . 'languages' );
 	}
 
 	public function create_menu()
@@ -330,7 +330,7 @@ class PluginInstall
 
 		// Query the directory
 		$args = [
-			'per_page' => 10,
+			'per_page' => 12,
 			'page'     => $page,
 		];
 
@@ -358,33 +358,34 @@ class PluginInstall
 
 		<div class="wrap plugin-install-tab">
 			<h1 class="wp-heading-inline"><?php echo esc_html__('Plugins', 'classicpress-directory-integration'); ?></h1>
+			<h2 class="screen-reader-text"><?php echo esc_html__('Plugins list', 'classicpress-directory-integration'); ?></h2>
+
+			<!-- Search form -->
+			<div class="cp-plugin-search-form">
+				<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-plugin-install'], remove_query_arg(['getpage']))); ?>">
+					<p class="cp-plugin-search-box">
+						<label for="searchfor" class="screen-reader-text" ><?php echo esc_html__('Search for plugins', 'classicpress-directory-integration'); ?></label><br>
+						<input type="text" id="searchfor" name="searchfor" class="wp-filter-search" placeholder="<?php echo esc_html__('Search for a plugin...', 'classicpress-directory-integration'); ?>"><br>
+						<?php
+						foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+							if (in_array($key, ['searchfor'])) {
+								continue;
+							}
+							echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
+						}
+						?>
+					</p>
+				</form>
+			</div>
 			<hr class="wp-header-end">
 
 			<div class="cp-plugins-page">
-				<h2 class="screen-reader-text"><?php echo esc_html__('Plugins list', 'classicpress-directory-integration'); ?></h2>
-				<!-- Search form -->
-				<div class="cp-plugin-search-form">
-					<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-plugin-install'], remove_query_arg(['getpage']))); ?>">
-						<p class="cp-plugin-search-box">
-							<label for="searchfor" class="screen-reader-text" ><?php echo esc_html__('Search for plugins', 'classicpress-directory-integration'); ?></label><br>
-							<input type="text" id="searchfor" name="searchfor" class="wp-filter-search" placeholder="<?php echo esc_html__('Search for a plugin...', 'classicpress-directory-integration'); ?>"><br>
-							<?php
-							foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-								if (in_array($key, ['searchfor'])) {
-									continue;
-								}
-								echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
-							}
-							?>
-						</p>
-					</form>
-				</div>
 				<div class="cp-plugin-cards">
 					<?php
 					foreach ( $plugins as $plugin ) {
 						$slug = $plugin['meta']['slug'];
 						$content = $plugin['content']['rendered'];
-						$markdown_contents = cp_get_markdown_plugin_contents( $content, '<div class="markdown-heading">', '</div>' );
+						$markdown_contents = cp_get_markdown_contents( $content, '<div class="markdown-heading">', '</div>' );
 						foreach ( $markdown_contents as $markdown_content ) {
 							$content = str_replace( '<div class="markdown-heading">' . $markdown_content . '</div>', $markdown_content, $content );
 						}
@@ -459,32 +460,4 @@ class PluginInstallSkin extends \Plugin_Installer_Skin
 	public function feedback($string, ...$args)
 	{
 	}
-}
-
-/**
- * Get all substrings within text that are found between two other, specified strings
- *
- * Avoids parsing HTML with regex
- *
- * Returns an array
- *
- * See https://stackoverflow.com/a/27078384
- */
-function cp_get_markdown_plugin_contents( $str, $startDelimiter, $endDelimiter ) {
-	$contents = [];
-	$startDelimiterLength = strlen( $startDelimiter );
-	$endDelimiterLength = strlen( $endDelimiter );
-	$startFrom = $contentStart = $contentEnd = 0;
-
-	while ( $contentStart = strpos( $str, $startDelimiter, $startFrom ) ) {
-		$contentStart += $startDelimiterLength;
-		$contentEnd = strpos( $str, $endDelimiter, $contentStart );
-		if ( $contentEnd === false ) {
-			break;
-		}
-		$contents[] = substr( $str, $contentStart, $contentEnd - $contentStart );
-		$startFrom = $contentEnd + $endDelimiterLength;
-	}
-
-	return $contents;
 }
