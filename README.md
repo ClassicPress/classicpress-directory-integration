@@ -22,3 +22,18 @@ Steps
 ## WP-CLI commands
 
 - Flush transients: `wp cpdi flush`
+
+## Hooks
+
+#### `apply_filters( "cpdi_images_folder_{$plugin}", string $folder )`
+Filters the folder where we search for icons and banners.
+The filtered path is relative to the plugin's directory.
+
+Example:
+```php
+add_filter(
+	'cpdi_images_folder_' . basename( __DIR__ ),
+	function ( $source ) {
+		return '/assets/images';
+	}
+);
