@@ -316,7 +316,7 @@ class ThemeInstall
 
 		// Query the directory
 		$args = [
-			'per_page' => 10,
+			'per_page' => 12,
 			'page'     => $page,
 		];
 
