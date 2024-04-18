@@ -32,7 +32,8 @@ class CPDICLI{
 	public function flush($args, $assoc_args) {
 		$transients = [
 			'cpdi_pi_notices',
-			'cpdi_directory_data',
+			'cpdi_ti_notices',
+			'cpdi_directory_data_plugins',
 			'cpdi_directory_data_themes',
 		];
 

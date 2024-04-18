@@ -171,25 +171,25 @@ class ThemeInstall
 	// Enqueue a notice
 	private function add_notice($message, $failure = false)
 	{
-		$other_notices = get_transient('cpdi_pi_notices');
+		$other_notices = get_transient('cpdi_ti_notices');
 		$notice = $other_notices === false ? '' : $other_notices;
 		$failure_style = $failure ? 'notice-error' : 'notice-success';
 		$notice .= '<div class="notice ' . $failure_style . ' is-dismissible">';
 		$notice .= '    <p>' . esc_html($message) . '</p>';
 		$notice .= '</div>';
-		set_transient('cpdi_pi_notices', $notice, \HOUR_IN_SECONDS);
+		set_transient('cpdi_ti_notices', $notice, \HOUR_IN_SECONDS);
 	}
 
 	// Display notices
 	private function display_notices()
 	{
-		$notices = get_transient('cpdi_pi_notices');
+		$notices = get_transient('cpdi_ti_notices');
 		if ($notices === false) {
 			return;
 		}
 		// This contains html formatted from 'add_notice' function that uses 'esc_html'.
 		echo $notices; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		delete_transient('cpdi_pi_notices');
+		delete_transient('cpdi_ti_notices');
 	}
 
 	// Deal with activation requests
