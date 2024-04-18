@@ -7,6 +7,10 @@
 	margin: -5em 0 0;
 }
 
+.plugin-install-tab .wp-header-end {
+	clear: both;
+}
+
 .wp-filter-search {
 	width: 280px;
 }
