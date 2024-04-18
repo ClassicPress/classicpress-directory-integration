@@ -291,7 +291,7 @@ class PluginUpdate {
 			// We have it in memory
 			return $this->cp_plugins_directory_data;
 		}
-		$this->cp_plugins_directory_data = get_transient('cpdi_directory_data');
+		$this->cp_plugins_directory_data = get_transient('cpdi_directory_data_plugins');
 		if (!$force && $this->cp_plugins_directory_data !== false) {
 			// We have it in transient
 			return $this->cp_plugins_directory_data;
@@ -320,7 +320,7 @@ class PluginUpdate {
 		}
 
 		$this->cp_plugins_directory_data = $data;
-		set_transient('cpdi_directory_data', $this->cp_plugins_directory_data, 3 * HOUR_IN_SECONDS);
+		set_transient('cpdi_directory_data_plugins', $this->cp_plugins_directory_data, 3 * HOUR_IN_SECONDS);
 		return $this->cp_plugins_directory_data;
 
 	}
