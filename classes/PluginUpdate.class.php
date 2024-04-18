@@ -98,82 +98,76 @@ class PluginUpdate {
 	}
 
 	private function get_plugin_images($type, $plugin) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-		// From Update Manager
-
-		// Initialize.
 		$images = [];
 
-		// Need argument missing? Bail.
 		if (empty($plugin)) {
 			return $images;
 		}
 
-		// Not a valid size passed in? Bail.
 		if (!in_array($type, ['icon', 'banner', 'screenshot'], true)) {
 			return $images;
 		}
 
-		// Set path and URL to this plugin's own images directory.
-		$image_path = untrailingslashit(WP_PLUGIN_DIR).'/'.$plugin.'/images';
-		$image_url  = untrailingslashit(WP_PLUGIN_URL).'/'.$plugin.'/images';
+		/**
+		 * Filters the folder where we search for icons and banners.
+		 *
+		 * The filtered path is relative to the plugin's directory
+		 *
+		 * Example:
+		 *	add_filter(
+		 *		'cpdi_images_folder_' . basename( __DIR__ ),
+		 *		function ( $source ) {
+		 *			return '/assets/images';
+		 * 		}
+		 *	);
+		 *
+		 *
+		 * @param string   $source  Original folder path.
+		 */
+		$folder     = apply_filters("cpdi_images_folder_{$plugin}", '/images');
+		$image_path = untrailingslashit(WP_PLUGIN_DIR).'/'.$plugin.$folder;
+		$image_url  = untrailingslashit(WP_PLUGIN_URL).'/'.$plugin.$folder;
 
-		// Banner and icon images are keyed differently; it's a core thing.
 		$image_qualities = [
 			'icon'   => ['default', '1x',  '2x'],
 			'banner' => ['default', 'low', 'high'],
 		];
 
-		// Array of dimensions for bannes and icons.
 		$image_dimensions = [
 			'icon'   => ['default' => '128',     '1x' => '128',      '2x' => '256'],
 			'banner' => ['default' => '772x250', 'low' => '772x250', 'high' => '1544x500'],
 		];
 
-		// Handle icon and banner requests.
 		if ($type === 'icon' || $type === 'banner') {
-			// For SVG banners/icons; one tiny loop handles both.
 			if (file_exists($image_path.'/'.$type.'.svg')) {
 				foreach ($image_qualities[$type] as $key) {
 					$images[$key] = $image_url.'/'.$type.'.svg';
 				}
 			} else {
-				// Ok, no svg. How about png or jpg?
-				// This loop doesn't break early, so, it favors png.
 				foreach (['jpg', 'png'] as $ext) {
-					// Pop keys off the end of the $images_qualities array.
 					$all_keys   = $image_qualities[$type];
 					$last_key   = array_pop($all_keys);
 					$middle_key = array_pop($all_keys);
-					// Normal size images found? Add them.
 					if (file_exists($image_path.'/'.$type.'-'.$image_dimensions[$type][$middle_key].'.'.$ext)) {
 						foreach ($image_qualities[$type] as $key) {
 							$images[$key] = $image_url.'/'.$type.'-'.$image_dimensions[$type][$middle_key].'.'.$ext;
 						}
 					}
-					// Retina image found? Add it.
 					if (file_exists($image_path.'/'.$type.'-'.$image_dimensions[$type][$last_key].'.'.$ext)) { // phpcs:ignore SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
 						$images[$last_key] = $image_url.'/'.$type.'-'.$image_dimensions[$type][$last_key].'.'.$ext;
 					}
+				}
+			}
 
-				} // foreach
-
-			} // inner if/else
-
-			// Return icon or banner URLs.
 			return $images;
-
 		}
 
-		// Oh, banners? Note these are from current version, not new version.
 		if ($type === 'screenshot') {
 
-			// Does /images/ directory exists? Prevent notices.
 			if (file_exists($image_path)) {
 
-				// Scan the directory.
 				$dir_contents = scandir($image_path);
 
-				// Capture only the screenshot URLs.
 				foreach ($dir_contents as $name) {
 					if (strpos(strtolower($name), 'screenshot') === 0) { // phpcs:ignore SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
 						$start = strpos($name, '-') + 1;
@@ -183,14 +177,12 @@ class PluginUpdate {
 					}
 				}
 
-				// Proper the sort.
 				ksort($images);
 
 			}
 
 		}
 
-		// Return any screenshot URLs.
 		return $images;
 
 	}
