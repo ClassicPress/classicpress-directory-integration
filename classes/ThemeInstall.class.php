@@ -32,7 +32,8 @@ class ThemeInstall
 		if ($hook !== $this->page) {
 			return;
 		}
-		wp_enqueue_script('classicpress-directory-integration-js-theme', plugins_url('../scripts/theme-page.js', __FILE__), ['jquery'], false, true);
+		wp_enqueue_script('classicpress-directory-integration-js-theme', plugins_url('../scripts/theme-page.js', __FILE__), array( 'wp-i18n' ), false, true);
+		wp_set_script_translations( 'classicpress-directory-integration-js-theme', 'classicpress-directory-integration', plugin_dir_path( 'classicpress-directory-integration' ) . 'languages' );
 	}
 
 	public function create_menu()
@@ -342,30 +343,37 @@ class ThemeInstall
 ?>
 
 		<div class="wrap plugin-install-tab">
-			<h1 class="wp-heading-inline"><?php esc_html__('Themes', 'classicpress-directory-integration'); ?></h1>
+			<h1 class="wp-heading-inline"><?php echo esc_html__('Themes', 'classicpress-directory-integration'); ?></h1>
 			<hr class="wp-header-end">
 
 			<div class="cp-plugins-page">
-				<h3 class="screen-reader-text"><?php echo esc_html__('Themes list', 'classicpress-directory-integration'); ?></h3>
+				<h2 class="screen-reader-text"><?php echo esc_html__('Themes list', 'classicpress-directory-integration'); ?></h2>
 				<!-- Search form -->
 				<div class="cp-plugin-search-form">
 					<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-theme-install'], remove_query_arg(['getpage']))); ?>">
-						<label for="searchfor"><?php echo esc_html__('Search', 'classicpress-directory-integration'); ?></label><br>
-						<input type="text" id="searchfor" name="searchfor" placeholder="<?php echo esc_html__('Search a theme...', 'classicpress-directory-integration'); ?>"><br>
-						<?php
-						foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-							if (in_array($key, ['searchfor'])) {
-								continue;
+						<p class="cp-plugin-search-box">
+							<label for="searchfor" class="screen-reader-text"><?php echo esc_html__('Search for a theme', 'classicpress-directory-integration'); ?></label><br>
+							<input type="text" id="searchfor" name="searchfor" class="wp-filter-search" placeholder="<?php echo esc_html__('Search for a theme...', 'classicpress-directory-integration'); ?>"><br>
+							<?php
+							foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+								if (in_array($key, ['searchfor'])) {
+									continue;
+								}
+								echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
 							}
-							echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
-						}
-						?>
+							?>
+						</p>
 					</form>
 				</div>
 				<div class="cp-plugin-cards">
 					<?php
 					foreach ($themes as $theme) {
 						$slug = $theme['meta']['slug'];
+						$content = $theme['content']['rendered'];
+						$markdown_contents = cp_get_markdown_contents( $content, '<div class="markdown-heading">', '</div>' );
+						foreach ( $markdown_contents as $markdown_content ) {
+							$content = str_replace( '<div class="markdown-heading">' . $markdown_content . '</div>', $markdown_content, $content );
+						}
 					?>
 						<article class="cp-plugin-card" id="cp-plugin-id-<?php echo esc_attr($slug); ?>">
 							<header class="cp-plugin-card-header">
@@ -375,19 +383,19 @@ class ThemeInstall
 							<div class="cp-plugin-card-body">
 								<div class="cp-plugin-description"><?php echo wp_kses_post($theme['excerpt']['rendered']); ?></div>
 							</div>
-							<footer class="cp-plugin-card-footer">
+							<footer class="cp-plugin-card-footer" data-content="<?php echo esc_attr( $content ); ?>">
 								<div class="cp-plugin-installs"><?php echo esc_html($theme['meta']['active_installations'] === '' ? 0 : $theme['meta']['active_installations']) . esc_html__(' Active Installations', 'classicpress-directory-integration'); ?></div>
 								<div class="cp-plugin-actions">
-									<a href="https://directory.classicpress.net/themes/<?php echo esc_attr( $slug ); ?>" target="_blank" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
+									<a href="<?php echo esc_url( admin_url( 'themes.php?tab=theme-information&theme=' . $slug ) ); ?>" class="button link-txt"><?php esc_html_e('More Details', 'classicpress-directory-integration'); ?></a>
 									<?php
 									if (!array_key_exists($slug, $local_cp_themes)) {
-										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'install', 'slug' => $slug]), 'install', '_cpdi')) . '" class="button install-now">' . esc_html__('Install', 'classicpress-directory-integration') . '</a>';
+										echo '<a href="' . esc_url(wp_nonce_url(add_query_arg(['action' => 'install', 'slug' => $slug]), 'install', '_cpdi')) . '" class="button install-now">' . esc_html__('Install', 'classicpress-directory-integration') . '</a>';
 									}
 									if ( array_key_exists($slug, $local_cp_themes) && ($local_cp_themes[$slug]['Active'] == $slug ) ) {
 										echo '<span class="cp-plugin-installed">' . esc_html__('Active', 'classicpress-directory-integration') . '</span>';
 									}
 									if ( array_key_exists($slug, $local_cp_themes) && ($local_cp_themes[$slug]['Active'] != $slug ) ) {
-										echo '<a href="' . esc_url_raw(wp_nonce_url(add_query_arg(['action' => 'activate', 'slug' => $slug]), 'activate', '_cpdi')) . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
+										echo '<a href="' . esc_url(wp_nonce_url(add_query_arg(['action' => 'activate', 'slug' => $slug]), 'activate', '_cpdi')) . '" class="button button-primary">' . esc_html__('Activate', 'classicpress-directory-integration') . '</a>';
 									}
 									?>
 								</div>
@@ -398,7 +406,6 @@ class ThemeInstall
 					?>
 				</div>
 
-				<hr>
 				<nav aria-label="<?php esc_attr_e('theme search results navigation', 'classicpress-directory-integration'); ?>">
 					<ul class="cp-plugins-pagination">
 						<?php
