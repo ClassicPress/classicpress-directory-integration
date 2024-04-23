@@ -238,21 +238,6 @@ class PluginUpdate {
 		$this->get_directory_data(true);
 	}
 
-	// Add a test menu. ToDo: remove
-	public function create_test_menu() {
-		if (!current_user_can('manage_options')) {
-			return;
-		}
-		$page = add_menu_page(
-			'Plugin Update tests',
-			'Plugin Update tests',
-			'manage_options',
-			'classicpress-directory-integration-plugin-update-test',
-			[$this, 'render_test_page'],
-			'dashicons-pets'
-		);
-	}
-
 	// Get all installed ClassicPress plugin
 	private function get_cp_plugins() {
 

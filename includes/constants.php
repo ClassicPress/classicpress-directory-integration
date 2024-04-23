@@ -16,5 +16,4 @@ if (!defined('ABSPATH')) {
 	die();
 }
 
-// define ('CLASSICPRESS_DIRECTORY_INTEGRATION_VERSION', '0.2.0'); Maybe remove if unused
 define ('CLASSICPRESS_DIRECTORY_INTEGRATION_URL', 'https://directory.classicpress.net/wp-json/wp/v2/');
