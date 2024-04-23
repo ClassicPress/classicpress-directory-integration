@@ -28,6 +28,8 @@ if (!defined('ABSPATH')) {
 	die();
 }
 
+const DB_VERSION = 1;
+
 // Load non namespaced constants and functions
 require_once 'includes/constants.php';
 require_once 'includes/functions.php';
