@@ -34,6 +34,9 @@ const DB_VERSION = 1;
 require_once 'includes/constants.php';
 require_once 'includes/functions.php';
 
+// Load Helpers trait.
+require_once 'classes/Helpers.trait.php';
+
 // Load Plugin Update functionality class.
 require_once 'classes/PluginUpdate.class.php';
 $plugin_update = new PluginUpdate();

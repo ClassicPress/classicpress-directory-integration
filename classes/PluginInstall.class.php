@@ -6,6 +6,7 @@ require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
 class PluginInstall
 {
+	use Helpers;
 
 	private $local_cp_plugins = false;
 
@@ -385,7 +386,7 @@ class PluginInstall
 					foreach ( $plugins as $plugin ) {
 						$slug = $plugin['meta']['slug'];
 						$content = $plugin['content']['rendered'];
-						$markdown_contents = cp_get_markdown_contents( $content, '<div class="markdown-heading">', '</div>' );
+						$markdown_contents = self::get_markdown_contents( $content, '<div class="markdown-heading">', '</div>' );
 						foreach ( $markdown_contents as $markdown_content ) {
 							$content = str_replace( '<div class="markdown-heading">' . $markdown_content . '</div>', $markdown_content, $content );
 						}
