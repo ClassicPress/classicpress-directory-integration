@@ -7,6 +7,8 @@ require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 class ThemeInstall
 {
 
+	use Helpers;
+
 	private $local_cp_themes = false;
 
 	private $page = null;
@@ -371,7 +373,7 @@ class ThemeInstall
 					foreach ($themes as $theme) {
 						$slug = $theme['meta']['slug'];
 						$content = $theme['content']['rendered'];
-						$markdown_contents = cp_get_markdown_contents( $content, '<div class="markdown-heading">', '</div>' );
+						$markdown_contents = self::get_markdown_contents( $content, '<div class="markdown-heading">', '</div>' );
 						foreach ( $markdown_contents as $markdown_content ) {
 							$content = str_replace( '<div class="markdown-heading">' . $markdown_content . '</div>', $markdown_content, $content );
 						}
