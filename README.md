@@ -10,6 +10,8 @@
 
 #### Themes from ClassicPress Directory now can be installed using the "CP Themes" menu under "Appearance" menu.
 
+#### 0.3.2 Adjust Menus when Multisite (Offer in Network Admin)
+
 ## WP-CLI commands
 
 - Flush transients: `wp cpdi flush`

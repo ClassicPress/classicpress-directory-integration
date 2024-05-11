@@ -15,8 +15,13 @@ class ThemeInstall
 
 	public function __construct()
 	{
-		// Add menu under Appearance.
-		add_action('admin_menu', [$this, 'create_menu'], 100);
+		// Add Menu Items.
+		if (is_multisite()) {
+			add_action('network_admin_menu', [$this, 'create_menu'], 100);
+			add_action('network_admin_menu', [$this, 'rename_menu']);
+		} else {
+			add_action('admin_menu', [$this, 'create_menu'], 100);
+		}
 		add_action('admin_enqueue_scripts', [$this, 'styles']);
 		add_action('admin_enqueue_scripts', [$this, 'scripts']);
 	}
@@ -47,7 +52,7 @@ class ThemeInstall
 		$this->page = add_submenu_page(
 			'themes.php',
 			esc_html__('ClassicPress Themes', 'classicpress-directory-integration'),
-			esc_html__('CP Themes', 'classicpress-directory-integration'),
+			esc_html__('Install CP Themes', 'classicpress-directory-integration'),
 			'install_themes',
 			'classicpress-directory-integration-theme-install',
 			[$this, 'render_menu'],
@@ -56,6 +61,16 @@ class ThemeInstall
 
 		add_action('load-' . $this->page, [$this, 'activate_action']);
 		add_action('load-' . $this->page, [$this, 'install_action']);
+	}
+
+	public function rename_menu() {
+		global $submenu;
+		foreach ( $submenu['themes.php'] as $key => $value ) {
+			if($value[2] !== 'theme-install.php') {
+				continue;
+			}
+			$submenu['themes.php'][$key][0] = esc_html__('Install WP Themes', 'classicpress-directory-integration'); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		}
 	}
 
 	// Get all installed ClassicPress Themes
