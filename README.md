@@ -8,7 +8,7 @@
 
 #### Plugins from ClassicPress Directory now can be installed using the "Install CP Plugins" menu under "Plugins" menu.
 
-#### Themes from ClassicPress Directory now can be installed using the "CP Themes" menu under "Appearance" menu.
+#### Themes from ClassicPress Directory now can be installed using the "Install CP Themes" menu under "Appearance" menu.
 
 ## WP-CLI commands
 

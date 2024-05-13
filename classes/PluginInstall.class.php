@@ -15,10 +15,15 @@ class PluginInstall
 	public function __construct()
 	{
 		// Add menu under plugins.
-		add_action('admin_menu', [$this, 'create_menu'], 100);
+		if (is_multisite()) {
+			add_action('network_admin_menu', [$this, 'create_menu'], 100);
+			add_action('network_admin_menu', [$this, 'rename_menu']);
+		} else {
+			add_action('admin_menu', [$this, 'create_menu'], 100);
+			add_action('admin_menu', [$this, 'rename_menu']);
+		}
 		add_action('admin_enqueue_scripts', [$this, 'styles']);
 		add_action('admin_enqueue_scripts', [$this, 'scripts']);
-		add_action('admin_menu', [$this, 'rename_menu']);
 	}
 
 	public function styles($hook)
