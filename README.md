@@ -1,14 +1,12 @@
 ![ClassicPress Directory Integration Plugin logo](images/banner-772x250.png "ClassicPress Directory Integration Plugin")
 
-# Draft plugin for ClassicPress Directory integrator.
+# ClassicPress Directory integrator.
 
 ## Features
 
-#### Plugins and Themes from ClassicPress Directory now can update as WP.org plugins.
-
-#### Plugins from ClassicPress Directory now can be installed using the "Install CP Plugins" menu under "Plugins" menu.
-
-#### Themes from ClassicPress Directory now can be installed using the "Install CP Themes" menu under "Appearance" menu.
+- Plugins and themes from [ClassicPress Directory](https://directory.classicpress.net/) now can update as WP.org plugins.
+- Plugins from ClassicPress Directory now can be installed using the "Install CP Plugins" menu under "Plugins" menu.
+- Themes from ClassicPress Directory now can be installed using the "Install CP Themes" menu under "Appearance" menu.
 
 ## WP-CLI commands
 
@@ -19,6 +17,7 @@
 #### `apply_filters( "cpdi_images_folder_{$plugin}", string $folder )`
 Filters the folder where we search for icons and banners.
 The filtered path is relative to the plugin's directory.
+Default is `/images`.
 
 Example:
 ```php
@@ -28,3 +27,4 @@ add_filter(
 		return '/assets/images';
 	}
 );
+```
