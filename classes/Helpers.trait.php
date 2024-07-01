@@ -20,7 +20,7 @@ trait Helpers
 		$endDelimiterLength = strlen( $endDelimiter );
 		$startFrom = $contentStart = $contentEnd = 0;
 
-		while ( $contentStart = strpos( $str, $startDelimiter, $startFrom ) ) {
+		while ( $contentStart = strpos( $str, $startDelimiter, $startFrom ) ) { // phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 			$contentStart += $startDelimiterLength;
 			$contentEnd = strpos( $str, $endDelimiter, $contentStart );
 			if ( $contentEnd === false ) {
