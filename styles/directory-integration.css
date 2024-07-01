@@ -184,6 +184,17 @@
 	background-color: #fafafa;
 }
 
+.vetted-plugin .dashicons,
+.vetted-theme .dashicons{
+	float: right;
+	color: #057f99;
+}
+
+.vetted-plugin,
+.vetted-theme {
+	background-color: #EBF4F7;
+}
+
 #plugin-install-from-modal {
 	float: right;
 	margin-top: -2px;
