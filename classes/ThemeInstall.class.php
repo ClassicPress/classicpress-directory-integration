@@ -388,14 +388,16 @@ class ThemeInstall
 					foreach ($themes as $theme) {
 						$slug = $theme['meta']['slug'];
 						$content = $theme['content']['rendered'];
+						$vetted = $theme['meta']['cpcs_status'] === 'passing' ? '<span class="vetted-theme dashicons dashicons-shield"></span>' : '';
+						$vetted_article = $theme['meta']['cpcs_status'] === 'passing' ? ' vetted-theme' : '';
 						$markdown_contents = self::get_markdown_contents( $content, '<div class="markdown-heading">', '</div>' );
 						foreach ( $markdown_contents as $markdown_content ) {
 							$content = str_replace( '<div class="markdown-heading">' . $markdown_content . '</div>', $markdown_content, $content );
 						}
 					?>
-						<article class="cp-plugin-card" id="cp-plugin-id-<?php echo esc_attr($slug); ?>">
+						<article class="cp-plugin-card<?php echo esc_attr($vetted_article); ?>" id="cp-plugin-id-<?php echo esc_attr($slug); ?>">
 							<header class="cp-plugin-card-header">
-								<h3><?php echo esc_html($theme['title']['rendered']); ?></h3>
+								<h3><?php echo esc_html($theme['title']['rendered']); echo wp_kses_post($vetted); ?></h3>
 								<div class="cp-plugin-author"><?php echo wp_kses(sprintf(__('By <b>%1$s</b>.', 'classicpress-directory-integration'), $theme['meta']['developer_name']), ['b' => []]); ?></div>
 							</header>
 							<div class="cp-plugin-card-body">
