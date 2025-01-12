@@ -209,21 +209,9 @@
 
 @media (min-width: 783px) {
     .cp-plugin-cards {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     }
     .cp-plugin-actions .cp-plugin-installed {
 		height: unset;
-    }
-}
-
-@media (min-width: 900px) {
-    .cp-plugin-cards {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .cp-plugin-cards {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
     }
 }
