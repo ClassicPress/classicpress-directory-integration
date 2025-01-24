@@ -32,7 +32,7 @@ if (!defined('ABSPATH')) {
 if(!function_exists('classicpress_version')) {
     add_action('admin_init', 'ClassicPress\Directory\deactivate_plugin_now');
     add_action('admin_notices', 'ClassicPress\Directory\error_is_wp');
-    unset($_GET['activate']);
+    unset($_GET['activate']); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
     return;
 }
 
@@ -44,8 +44,8 @@ function deactivate_plugin_now() {
 
 function error_is_wp () {
     $class = 'notice notice-error';
-    $message = __( 'ClassicPress Directory integration is a plugin meant to only work on ClassicPress sites.', 'classicpress-directory-integration' );
-    printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
+    $message = __('ClassicPress Directory integration is a plugin meant to only work on ClassicPress sites.', 'classicpress-directory-integration');
+    printf('<div class="%1$s"><p>%2$s</p></div>', esc_attr($class), esc_html($message));
 }
 
 const DB_VERSION = 1;
