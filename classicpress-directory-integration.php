@@ -44,7 +44,7 @@ function deactivate_plugin_now() {
 
 function error_is_wp () {
     $class = 'notice notice-error';
-    $message = __( 'ClassicPress Directory Integration can\'t work on WordPress', 'classicpress-directory-integration' );
+    $message = __( 'ClassicPress Directory integration is a plugin meant to only work on ClassicPress sites.', 'classicpress-directory-integration' );
     printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
 }
 
