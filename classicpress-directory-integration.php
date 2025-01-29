@@ -4,7 +4,7 @@
  * -----------------------------------------------------------------------------
  * Plugin Name:  ClassicPress Directory Integration
  * Description:  Install and update plugins and themes from ClassicPress directory.
- * Version:      1.1.1
+ * Version:      1.1.2
  * Author:       ClassicPress Contributors
  * Author URI:   https://www.classicpress.net
  * Plugin URI:   https://www.classicpress.net
@@ -26,6 +26,26 @@ namespace ClassicPress\Directory;
 // Prevent direct access.
 if (!defined('ABSPATH')) {
 	die();
+}
+
+// Bail if on WordPress
+if(!function_exists('classicpress_version')) {
+    add_action('admin_init', 'ClassicPress\Directory\deactivate_plugin_now');
+    add_action('admin_notices', 'ClassicPress\Directory\error_is_wp');
+    unset($_GET['activate']); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    return;
+}
+
+function deactivate_plugin_now() {
+    if (is_plugin_active('classicpress-directory-integration/classicpress-directory-integration.php')) {
+        deactivate_plugins('classicpress-directory-integration/classicpress-directory-integration.php');
+    }
+}
+
+function error_is_wp () {
+    $class = 'notice notice-error';
+    $message = __('ClassicPress Directory integration is a plugin meant to only work on ClassicPress sites.', 'classicpress-directory-integration');
+    printf('<div class="%1$s"><p>%2$s</p></div>', esc_attr($class), esc_html($message));
 }
 
 const DB_VERSION = 1;
