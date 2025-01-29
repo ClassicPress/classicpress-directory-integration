@@ -37,15 +37,15 @@ if(!function_exists('classicpress_version')) {
 }
 
 function deactivate_plugin_now() {
-    if ( is_plugin_active( 'classicpress-directory-integration/classicpress-directory-integration.php' ) ) {
-        deactivate_plugins( 'classicpress-directory-integration/classicpress-directory-integration.php' );
+    if (is_plugin_active('classicpress-directory-integration/classicpress-directory-integration.php')) {
+        deactivate_plugins('classicpress-directory-integration/classicpress-directory-integration.php');
     }
 }
 
 function error_is_wp () {
     $class = 'notice notice-error';
-    $message = __( 'ClassicPress Directory Integration can\'t work on WordPress', 'classicpress-directory-integration' );
-    printf( '<div class="%1$s"><p>%2$s</p></div>', $class, $message );
+    $message = __('ClassicPress Directory Integration can\'t work on WordPress', 'classicpress-directory-integration');
+    printf('<div class="%1$s"><p>%2$s</p></div>', $class, $message);
 }
 
 const DB_VERSION = 1;
