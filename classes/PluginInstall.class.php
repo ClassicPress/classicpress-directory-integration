@@ -161,8 +161,16 @@ class PluginInstall
 
 		$e = wp_remote_retrieve_response_code($response);
 		if ($e !== 200) {
-			$result['error'] = $response['response']['message'];
+			$result['error'] = $response['response']['message'].'.';
 			$result['code']  = $response['response']['code'];
+			if (!isset($response['body']) || !json_validate($response['body'])) {
+				return $result;
+			}
+			$api_message = json_decode($response['body'], true);
+			if(!isset($api_message['message'])) {
+				return $result;
+			}
+			$result['error'] .= ' '.$api_message['message'];
 			return $result;
 		}
 
