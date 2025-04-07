@@ -356,6 +356,7 @@ class PluginInstall
 		if (isset($_REQUEST['searchingfor']) && $_REQUEST['searchingfor'] !== $searching) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$args['page'] = 1;
 		}
+
 		$result = $this->do_directory_request($args);
 		if ($result['success'] === false) {
 			// Query failed, display errors and exit.

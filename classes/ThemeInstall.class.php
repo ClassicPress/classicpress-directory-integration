@@ -155,8 +155,16 @@ class ThemeInstall
 
 		$e = wp_remote_retrieve_response_code($response);
 		if ($e !== 200) {
-			$result['error'] = $response['response']['message'];
+			$result['error'] = $response['response']['message'].'.';
 			$result['code']  = $response['response']['code'];
+			if (!isset($response['body']) || !json_validate($response['body'])) {
+				return $result;
+			}
+			$api_message = json_decode($response['body'], true);
+			if(!isset($api_message['message'])) {
+				return $result;
+			}
+			$result['error'] .= ' '.$api_message['message'];
 			return $result;
 		}
 
@@ -340,6 +348,11 @@ class ThemeInstall
 		if (isset($_REQUEST['searchfor'])) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$args['search'] = sanitize_text_field(wp_unslash($_REQUEST['searchfor'])); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
+		// Reset paginations for new searches
+		$searching = $args['search'] ?? '';
+		if (isset($_REQUEST['searchingfor']) && $_REQUEST['searchingfor'] !== $searching) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['page'] = 1;
+		}
 
 		$result = $this->do_directory_request($args);
 		if ($result['success'] === false) {
@@ -368,10 +381,11 @@ class ThemeInstall
 				<form method="GET" action="<?php echo esc_url(add_query_arg(['page' => 'classicpress-directory-integration-theme-install'], remove_query_arg(['getpage']))); ?>">
 					<p class="cp-plugin-search-box">
 						<label for="searchfor" class="screen-reader-text"><?php echo esc_html__('Search for a theme', 'classicpress-directory-integration'); ?></label><br>
+						<input type="hidden" name="searchingfor" value="<?php echo esc_html($searching); ?>">
 						<input type="text" id="searchfor" name="searchfor" class="wp-filter-search" placeholder="<?php echo esc_html__('Search for a theme...', 'classicpress-directory-integration'); ?>"><br>
 						<?php
 						foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-							if (in_array($key, ['searchfor'])) {
+							if (in_array($key, ['searchfor', 'getpage'])) {
 								continue;
 							}
 							echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_html($val) . '" />';
