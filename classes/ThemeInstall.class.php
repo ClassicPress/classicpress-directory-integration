@@ -382,7 +382,7 @@ class ThemeInstall
 					<p class="cp-plugin-search-box">
 						<label for="searchfor" class="screen-reader-text"><?php echo esc_html__('Search for a theme', 'classicpress-directory-integration'); ?></label><br>
 						<input type="hidden" name="searchingfor" value="<?php echo esc_html($searching); ?>">
-						<input type="text" id="searchfor" name="searchfor" class="wp-filter-search" placeholder="<?php echo esc_html__('Search for a theme...', 'classicpress-directory-integration'); ?>"><br>
+						<input type="search" id="searchfor" name="searchfor" class="wp-filter-search" <?php echo $searching !== '' ? 'value="'.esc_html($searching).'" ' : '' ?>placeholder="<?php echo esc_html__('Search for a theme...', 'classicpress-directory-integration'); ?>"><br>
 						<?php
 						foreach ((array) $_GET as $key => $val) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 							if (in_array($key, ['searchfor', 'getpage'])) {
