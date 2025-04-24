@@ -14,7 +14,7 @@ trait Helpers {
 	 *
 	 * See https://stackoverflow.com/a/27078384
 	 */
-	function get_markdown_contents( $str, $startDelimiter, $endDelimiter ) {
+	private function get_markdown_contents( $str, $startDelimiter, $endDelimiter ) {
 		$contents             = array();
 		$startDelimiterLength = strlen( $startDelimiter );
 		$endDelimiterLength   = strlen( $endDelimiter );

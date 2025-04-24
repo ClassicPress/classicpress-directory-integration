@@ -479,18 +479,14 @@ class PluginInstall {
 	} // End of render_menu()
 }
 
+// phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound
 class PluginInstallSkin extends \Plugin_Installer_Skin {
-
-
 	public function header() {
 	}
-
 	public function footer() {
 	}
-
 	public function error( $errors ) {
 	}
-
 	public function feedback( $string, ...$args ) {
 	}
 }
