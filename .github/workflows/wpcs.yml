@@ -17,7 +17,7 @@ jobs:
           with:
             use_local_config: 'true'
             enable_warnings: 'true'
-            extra_args: '-q -n'
+            extra_args: '-q -n --report-json=./phpcs.json'
         - name: Update summary
           run: |
             npm i -g github:10up/phpcs-json-to-md
