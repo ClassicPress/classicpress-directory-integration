@@ -2,6 +2,8 @@
 
 # ClassicPress Directory integrator.
 
+[![ClassicPress Directory Coding Standard checks.](https://github.com/ClassicPress/classicpress-directory-integration/actions/workflows/cpcs.yml/badge.svg)](https://github.com/ClassicPress/classicpress-directory-integration/actions/workflows/cpcs.yml)[![WPCS checks.](https://github.com/ClassicPress/classicpress-directory-integration/actions/workflows/wpcs.yml/badge.svg)](https://github.com/ClassicPress/classicpress-directory-integration/actions/workflows/wpcs.yml)
+
 ## Features
 
 - Plugins and themes from [ClassicPress Directory](https://directory.classicpress.net/) now can update as WP.org plugins.
