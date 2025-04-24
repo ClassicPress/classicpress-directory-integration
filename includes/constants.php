@@ -12,8 +12,8 @@
  */
 
 // Prevent direct access.
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
-define ('CLASSICPRESS_DIRECTORY_INTEGRATION_URL', 'https://directory.classicpress.net/wp-json/wp/v2/');
+define( 'CLASSICPRESS_DIRECTORY_INTEGRATION_URL', 'https://directory.classicpress.net/wp-json/wp/v2/' );
