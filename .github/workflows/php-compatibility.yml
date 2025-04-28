@@ -1,3 +1,11 @@
+name: PHP Compatibility.
+
+on: [pull_request, push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   phpcs:
       name: PHP Compatibility
