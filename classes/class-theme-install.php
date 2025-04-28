@@ -149,7 +149,7 @@ class ThemeInstall {
 		if ( $e !== 200 ) {
 			$result['error'] = $response['response']['message'] . '.';
 			$result['code']  = $response['response']['code'];
-			if ( ! isset( $response['body'] ) || ! json_validate( $response['body'] ) ) {
+			if ( ! isset( $response['body'] ) || ! self::json_validate( $response['body'] ) ) {
 				return $result;
 			}
 			$api_message = json_decode( $response['body'], true );
