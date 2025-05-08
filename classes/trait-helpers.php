@@ -37,7 +37,7 @@ trait Helpers {
 	 * The function is defined only in PHP 8 >= 8.3.0
 	 */
 	private static function json_validate( $json ) {
-		if ( function_exists( 'json_validate') ) {
+		if ( function_exists( 'json_validate' ) ) {
 			return json_validate( $json );
 		}
 		return json_decode( $json ) !== null;
