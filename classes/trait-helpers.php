@@ -4,7 +4,6 @@ namespace ClassicPress\Directory;
 
 trait Helpers {
 
-
 	/**
 	 * Get all substrings within text that are found between two other, specified strings
 	 *
@@ -32,4 +31,16 @@ trait Helpers {
 
 		return $contents;
 	}
+
+	/**
+	 * Polyfill for json_validate
+	 * The function is defined only in PHP 8 >= 8.3.0
+	 */
+	private static function json_validate( $json ) {
+		if ( function_exists( 'json_validate' ) ) {
+			return json_validate( $json );
+		}
+		return json_decode( $json ) !== null;
+	}
+
 }
