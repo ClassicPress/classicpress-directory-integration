@@ -2,8 +2,8 @@
 
 namespace ClassicPress\Directory;
 
-trait Helpers
-{
+trait Helpers {
+
 
 	/**
 	 * Get all substrings within text that are found between two other, specified strings
@@ -14,23 +14,22 @@ trait Helpers
 	 *
 	 * See https://stackoverflow.com/a/27078384
 	 */
-	function get_markdown_contents( $str, $startDelimiter, $endDelimiter ) {
-		$contents = [];
+	private function get_markdown_contents( $str, $startDelimiter, $endDelimiter ) {
+		$contents             = array();
 		$startDelimiterLength = strlen( $startDelimiter );
-		$endDelimiterLength = strlen( $endDelimiter );
-		$startFrom = $contentStart = $contentEnd = 0;
+		$endDelimiterLength   = strlen( $endDelimiter );
+		$startFrom            = $contentStart = $contentEnd = 0;
 
 		while ( $contentStart = strpos( $str, $startDelimiter, $startFrom ) ) { // phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 			$contentStart += $startDelimiterLength;
-			$contentEnd = strpos( $str, $endDelimiter, $contentStart );
+			$contentEnd    = strpos( $str, $endDelimiter, $contentStart );
 			if ( $contentEnd === false ) {
 				break;
 			}
 			$contents[] = substr( $str, $contentStart, $contentEnd - $contentStart );
-			$startFrom = $contentEnd + $endDelimiterLength;
+			$startFrom  = $contentEnd + $endDelimiterLength;
 		}
 
 		return $contents;
 	}
-
 }
