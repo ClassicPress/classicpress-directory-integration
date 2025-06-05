@@ -373,7 +373,7 @@ class ThemeInstall {
 						<input type="search" id="searchfor" name="searchfor" class="wp-filter-search" <?php echo $searching !== '' ? 'value="' . esc_html( $searching ) . '" ' : ''; ?>placeholder="<?php echo esc_html__( 'Search for a theme...', 'classicpress-directory-integration' ); ?>"><br>
 						<?php
 						foreach ( (array) $_GET as $key => $val ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-							if ( in_array( $key, array( 'searchfor', 'getpage' ) ) ) {
+							if ( in_array( $key, array( 'searchfor', 'getpage', 'searchingfor' ) ) ) {
 								continue;
 							}
 							echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_html( $val ) . '" />';
@@ -460,7 +460,7 @@ class ThemeInstall {
 						<?php
 						for ( $x = 1; $x <= $pages; $x++ ) {
 							$current_page = ( $x == $page ) ? ' cp-current-page" aria-current="page' : '';
-							$link         = '<a href="' . esc_url_raw( add_query_arg( array( 'getpage' => $x ), remove_query_arg( 'getpage' ) ) ) . '">' . (int) $x . '</a>';
+							$link         = '<a href="' . esc_url_raw( add_query_arg( array( 'getpage' => $x ), remove_query_arg( array( 'getpage', 'searchingfor' ) ) ) ) . '">' . (int) $x . '</a>';
 							echo '<li class="cp-search-page-item' . wp_kses_post( $current_page ) . '">' . wp_kses_post( $link ) . '</li>';
 						}
 						?>
