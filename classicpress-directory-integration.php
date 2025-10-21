@@ -61,17 +61,9 @@ require_once 'classes/trait-helpers.php';
 require_once 'classes/class-plugin-update.php';
 $plugin_update = new PluginUpdate();
 
-// Load Plugin Install functionality class.
-require_once 'classes/class-plugin-install.php';
-$plugin_install = new PluginInstall();
-
 // Load Theme Update functionality class.
 require_once 'classes/class-theme-update.php';
 $theme_update = new ThemeUpdate();
-
-// Load Theme Install functionality class.
-require_once 'classes/class-theme-install.php';
-$theme_install = new ThemeInstall();
 
 // Register text domain
 function register_text_domain() {
@@ -84,3 +76,15 @@ require_once 'classes/class-wpcli.php';
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	\WP_CLI::add_command( 'cpdi', '\ClassicPress\Directory\CPDICLI' );
 }
+
+if ( ! is_admin() ) {
+	return;
+}
+
+// Load Plugin Install functionality class.
+require_once 'classes/class-plugin-install.php';
+$plugin_install = new PluginInstall();
+
+// Load Theme Install functionality class.
+require_once 'classes/class-theme-install.php';
+$theme_install = new ThemeInstall();
