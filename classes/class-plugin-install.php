@@ -60,6 +60,10 @@ class PluginInstall {
 	}
 
 	public function rename_menu() {
+		if ( ! current_user_can( 'install_plugins' ) ) {
+			return;
+		}
+
 		global $submenu;
 		foreach ( $submenu['plugins.php'] as $key => $value ) {
 			if ( $value[2] !== 'plugin-install.php' ) {
