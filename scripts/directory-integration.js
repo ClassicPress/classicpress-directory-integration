@@ -36,7 +36,7 @@ document.addEventListener( 'DOMContentLoaded', function() {
 			status.id = 'plugin-install-from-modal';
 
 			dialog.showModal();
-			dialog.innerHTML = '<div id="plugin-information" style="width: ' + ( width * 9 / 10 ) + 'px;height: ' + ( height * 9 / 10 ) + 'px;" title="' + title + '"><button type="button" id="dialog-close-button" autofocus><span class="screen-reader-text">' + wp.i18n.__( 'Close' ) + '</span></button><div id="plugin-information-scrollable"><h2>' + header + '</h2>' + content + '<div style="height:60px"></div></div><div id="plugin-information-footer">' + status.outerHTML + '</div></div>';
+			dialog.innerHTML = '<div id="plugin-information" style="width: ' + ( width * 9 / 10 ) + 'px;height: ' + ( height * 9 / 10 ) + 'px;" title="' + title + '"><button type="button" id="dialog-close-button" autofocus><span class="screen-reader-text">' + wp.i18n.__( 'Close' ) + '</span></button><div id="plugin-information-scrollable"><div id="plugin-information-inner"><h2>' + header + '</h2>' + content + '</div></div><div id="plugin-information-footer">' + status.outerHTML + '</div></div>';
 
 			// Set initial focus on the "Close" button
 			closeButton = dialog.querySelector( '#dialog-close-button' );
