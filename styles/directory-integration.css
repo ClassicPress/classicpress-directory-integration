@@ -225,4 +225,8 @@
 	.cp-plugin-search-box .wp-filter-search {
 		width: 100%;
 	}
+
+	#plugin-information-footer {
+		height: 40px;
+	}
 }
