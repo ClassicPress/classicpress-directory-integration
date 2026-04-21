@@ -2,9 +2,8 @@
 	margin-bottom: 1em;
 }
 
-.cp-plugin-search-box {
+.cp-plugin-search-form {
 	float: right;
-	margin: -5em 0 0;
 }
 
 .plugin-install-tab .wp-header-end {
@@ -154,23 +153,23 @@
 	border: 2px solid #000;
 }
 
-#plugin-information-scrollable {
-	padding: 0 1.5em;
+#plugin-information-inner {
+	padding: 0 1.5em 60px;
 }
 
-#plugin-information-scrollable h2 {
+#plugin-information-inner h2 {
 	font-size: 2em;
 }
 
-#plugin-information-scrollable h4 {
+#plugin-information-inner h4 {
 	font-size: 1.2em;
 }
 
-#plugin-information-scrollable h5 {
+#plugin-information-inner h5 {
 	font-size: 1.1em;
 }
 
-#plugin-information-scrollable h6 {
+#plugin-information-inner h6 {
 	font-size: 1.05em;
 }
 
@@ -197,7 +196,6 @@
 
 #plugin-install-from-modal {
 	float: right;
-	margin-top: -2px;
 }
 
 #plugin-information-footer .cp-plugin-installed {
@@ -214,4 +212,21 @@
     .cp-plugin-actions .cp-plugin-installed {
 		height: unset;
     }
+}
+
+@media (max-width: 782px) {
+	.cp-plugin-search-form {
+		float: none;
+		clear: both;
+		width: 100%;
+		margin: 0 0 3em;
+	}
+
+	.cp-plugin-search-box .wp-filter-search {
+		width: 100%;
+	}
+
+	#plugin-information-footer {
+		height: 40px;
+	}
 }
