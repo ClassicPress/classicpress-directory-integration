@@ -191,7 +191,7 @@ class ThemeInstall {
 		$notice        = $other_notices === false ? '' : $other_notices;
 		$failure_style = $failure ? 'notice-error' : 'notice-success';
 		$notice       .= '<div class="notice ' . $failure_style . ' is-dismissible">';
-		$notice       .= '    <p>' . esc_html( $message ) . '</p>';
+		$notice       .= '    >' . esc_html( $message ) . '</p>';
 		$notice       .= '</div>';
 		set_transient( 'cpdi_ti_notices', $notice, \HOUR_IN_SECONDS );
 	}
@@ -367,7 +367,7 @@ class ThemeInstall {
 			<!-- Search form -->
 			<div class="cp-plugin-search-form">
 				<form method="GET" action="<?php echo esc_url( add_query_arg( array( 'page' => 'classicpress-directory-integration-theme-install' ), remove_query_arg( array( 'getpage' ) ) ) ); ?>">
-					<p class="cp-plugin-search-box">
+					<fieldset class="cp-plugin-search-box">
 						<label for="searchfor" class="screen-reader-text"><?php echo esc_html__( 'Search for a theme', 'classicpress-directory-integration' ); ?></label>
 						<input type="hidden" name="searchingfor" value="<?php echo esc_html( $searching ); ?>">
 						<input type="search" id="searchfor" name="searchfor" class="wp-filter-search" <?php echo $searching !== '' ? 'value="' . esc_html( $searching ) . '" ' : ''; ?>placeholder="<?php echo esc_html__( 'Search for a theme...', 'classicpress-directory-integration' ); ?>">
@@ -379,7 +379,7 @@ class ThemeInstall {
 							echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_html( $val ) . '" />';
 						}
 						?>
-					</p>
+					</fieldset>
 				</form>
 			</div>
 			<hr class="wp-header-end">
