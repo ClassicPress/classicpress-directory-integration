@@ -4,6 +4,7 @@
 
 .cp-plugin-search-form {
 	float: right;
+	margin: 1em 0;
 }
 
 .plugin-install-tab .wp-header-end {
@@ -157,19 +158,19 @@
 	padding: 0 1.5em 60px;
 }
 
-#plugin-information-inner h2 {
+#plugin-information-scrollable h2 {
 	font-size: 2em;
 }
 
-#plugin-information-inner h4 {
+#plugin-information-scrollable h4 {
 	font-size: 1.2em;
 }
 
-#plugin-information-inner h5 {
+#plugin-information-scrollable h5 {
 	font-size: 1.1em;
 }
 
-#plugin-information-inner h6 {
+#plugin-information-scrollable h6 {
 	font-size: 1.05em;
 }
 
