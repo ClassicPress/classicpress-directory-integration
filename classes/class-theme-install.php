@@ -191,7 +191,7 @@ class ThemeInstall {
 		$notice        = $other_notices === false ? '' : $other_notices;
 		$failure_style = $failure ? 'notice-error' : 'notice-success';
 		$notice       .= '<div class="notice ' . $failure_style . ' is-dismissible">';
-		$notice       .= '    >' . esc_html( $message ) . '</p>';
+		$notice       .= '    <p>' . esc_html( $message ) . '</p>';
 		$notice       .= '</div>';
 		set_transient( 'cpdi_ti_notices', $notice, \HOUR_IN_SECONDS );
 	}
