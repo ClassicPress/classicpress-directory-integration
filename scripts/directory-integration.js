@@ -18,16 +18,16 @@ document.addEventListener( 'DOMContentLoaded', function() {
 	openers.forEach( function( opener ) {
 		opener.addEventListener( 'click', function( e ) {
 			var closeButton,
-				header = opener.closest( 'article' ).querySelector( 'h3' ).textContent,
+				header = opener.closest( 'article' ).querySelector( 'h3' ).textContent.trim(),
 				content = opener.closest( 'footer' ).dataset.content,
 				status = opener.nextElementSibling,
-				title = opener.closest( 'article' ).querySelector( 'h3' ).textContent ?
+				title = header ?
 					wp.i18n.sprintf(
-						// translators: %s: Plugin name.
-						wp.i18n.__( 'Plugin: %s' ),
-						opener.closest( 'article' ).querySelector( 'h3' ).textContent
+						// translators: %s: Plugin or Theme name.
+						wp.i18n.__( '%s Details' ),
+						header
 					) :
-					wp.i18n.__( 'Plugin details' );
+					wp.i18n.__( 'Details' );
 
 			e.preventDefault();
 			e.stopPropagation();
