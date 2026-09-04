@@ -375,10 +375,10 @@ class PluginInstall {
 			<!-- Search form -->
 			<div class="cp-plugin-search-form">
 				<form method="GET" action="<?php echo esc_url( add_query_arg( array( 'page' => 'classicpress-directory-integration-plugin-install' ), remove_query_arg( array( 'getpage' ) ) ) ); ?>">
-					<p class="cp-plugin-search-box">
-						<label for="searchfor" class="screen-reader-text" ><?php echo esc_html__( 'Search for plugins', 'classicpress-directory-integration' ); ?></label><br>
+					<fieldset class="cp-plugin-search-box">
+						<label for="searchfor" class="screen-reader-text" ><?php echo esc_html__( 'Search for plugins', 'classicpress-directory-integration' ); ?></label>
 						<input type="hidden" name="searchingfor" value="<?php echo esc_html( $searching ); ?>">
-						<input type="search" id="searchfor" name="searchfor" class="wp-filter-search" <?php echo $searching !== '' ? 'value="' . esc_html( $searching ) . '" ' : ''; ?>placeholder="<?php echo esc_html__( 'Search for a plugin...', 'classicpress-directory-integration' ); ?>"><br>
+						<input type="search" id="searchfor" name="searchfor" class="wp-filter-search" <?php echo $searching !== '' ? 'value="' . esc_html( $searching ) . '" ' : ''; ?>placeholder="<?php echo esc_html__( 'Search for a plugin...', 'classicpress-directory-integration' ); ?>">
 						<?php
 						foreach ( (array) $_GET as $key => $val ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 							if ( in_array( $key, array( 'searchfor', 'getpage', 'searchingfor' ) ) ) {
@@ -387,7 +387,7 @@ class PluginInstall {
 							echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_html( $val ) . '" />';
 						}
 						?>
-					</p>
+					</fieldset>
 				</form>
 			</div>
 			<hr class="wp-header-end">

@@ -2,9 +2,9 @@
 	margin-bottom: 1em;
 }
 
-.cp-plugin-search-box {
+.cp-plugin-search-form {
 	float: right;
-	margin: -5em 0 0;
+	margin: 1em 0;
 }
 
 .plugin-install-tab .wp-header-end {
@@ -156,6 +156,7 @@
 
 #plugin-information-scrollable {
 	padding: 0 1.5em;
+	height: calc(100% - 60px);
 }
 
 #plugin-information-scrollable h2 {
@@ -214,4 +215,17 @@
     .cp-plugin-actions .cp-plugin-installed {
 		height: unset;
     }
+}
+
+@media (max-width: 782px) {
+	.cp-plugin-search-form {
+		float: none;
+		clear: both;
+		width: 100%;
+		margin: 0 0 3em;
+	}
+
+	.cp-plugin-search-box .wp-filter-search {
+		width: 100%;
+	}
 }
