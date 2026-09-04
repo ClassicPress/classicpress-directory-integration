@@ -154,8 +154,9 @@
 	border: 2px solid #000;
 }
 
-#plugin-information-inner {
-	padding: 0 1.5em 60px;
+#plugin-information-scrollable {
+	padding: 0 1.5em;
+	height: calc(100% - 60px);
 }
 
 #plugin-information-scrollable h2 {
