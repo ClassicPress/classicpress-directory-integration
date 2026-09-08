@@ -36,6 +36,7 @@ class PluginInstall {
 		if ( $hook !== $this->page ) {
 			return;
 		}
+		wp_enqueue_script( 'cp-polyfill' );
 		wp_enqueue_script( 'classicpress-directory-integration-js', plugins_url( '../scripts/directory-integration.js', __FILE__ ), array( 'wp-i18n' ), false, true );
 		wp_set_script_translations( 'classicpress-directory-integration-js', 'classicpress-directory-integration', plugin_dir_path( 'classicpress-directory-integration' ) . 'languages' );
 	}
