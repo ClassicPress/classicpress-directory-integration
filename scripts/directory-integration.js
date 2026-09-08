@@ -17,7 +17,13 @@ document.addEventListener( 'DOMContentLoaded', function() {
 	 */
 	openers.forEach( function( opener ) {
 		opener.addEventListener( 'click', function( e ) {
-			var closeButton,
+			var divInfo = document.createElement( 'div' ),
+				closeButton = document.createElement( 'button' ),
+				span = document.createElement( 'span' ),
+				scrollable = document.createElement( 'div' ),
+				h2 = document.createElement( 'h2' ),
+				div = document.createElement( 'div' ),
+				infoFooter = document.createElement( 'div' ),
 				header = opener.closest( 'article' ).querySelector( 'h3' ).textContent,
 				content = opener.closest( 'footer' ).dataset.content,
 				status = opener.nextElementSibling,
@@ -35,11 +41,36 @@ document.addEventListener( 'DOMContentLoaded', function() {
 			content = reduceheaders( content );
 			status.id = 'plugin-install-from-modal';
 
+			divInfo.id = 'plugin-information';
+			divInfo.title = title;
+			divInfo.style.width = parseInt( width * 9 / 10 ) + 'px';
+			divInfo.style.height = parseInt( height * 9 / 10 ) + 'px';
+
+			closeButton.id = 'dialog-close-button';
+			closeButton.type = 'button';
+			closeButton.setAttribute( 'autofocus', 'true' );
+
+			span.className = 'screen-reader-text';
+			span.textContent = wp.i18n.__( 'Close' );
+			closeButton.append( span );
+			
+			scrollable.id = 'plugin-information-scrollable';
+			scrollable.setHTML( content );
+			h2.textContent = header;
+			infoFooter.id = 'plugin-information-footer';
+			infoFooter.setHTML( status.outerHTML, {
+				sanitizer: {
+					allowAttributes: ['id', 'class']
+				}
+			} );
+			scrollable.prepend( h2 );
+			scrollable.append( div );
+
+			divInfo.append( closeButton, scrollable, infoFooter );
+			dialog.replaceChildren( divInfo );
 			dialog.showModal();
-			dialog.innerHTML = '<div id="plugin-information" style="width: ' + ( width * 9 / 10 ) + 'px;height: ' + ( height * 9 / 10 ) + 'px;" title="' + title + '"><button type="button" id="dialog-close-button" autofocus><span class="screen-reader-text">' + wp.i18n.__( 'Close' ) + '</span></button><div id="plugin-information-scrollable"><h2>' + header + '</h2>' + content + '<div style="height:60px"></div></div><div id="plugin-information-footer">' + status.outerHTML + '</div></div>';
 
 			// Set initial focus on the "Close" button
-			closeButton = dialog.querySelector( '#dialog-close-button' );
 			closeButton.focus();
 
 			// Remove modal contents using mouse
