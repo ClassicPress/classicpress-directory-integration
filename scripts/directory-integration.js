@@ -57,15 +57,15 @@ document.addEventListener( 'DOMContentLoaded', function() {
 			scrollable.id = 'plugin-information-scrollable';
 			scrollable.setHTML( content );
 			h2.textContent = header;
+			scrollable.prepend( h2 );
+			scrollable.append( div );
+			
 			infoFooter.id = 'plugin-information-footer';
 			infoFooter.setHTML( status.outerHTML, {
 				sanitizer: {
 					allowAttributes: ['id', 'class']
 				}
 			} );
-			scrollable.prepend( h2 );
-			scrollable.append( div );
-
 			divInfo.append( closeButton, scrollable, infoFooter );
 			dialog.replaceChildren( divInfo );
 			dialog.showModal();
