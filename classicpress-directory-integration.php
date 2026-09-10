@@ -11,7 +11,7 @@
  * Text Domain:  classicpress-directory-integration
  * Domain Path:  /languages
  * Requires PHP: 7.4
- * Requires CP:  2.0
+ * Requires CP:  2.8
  * -----------------------------------------------------------------------------
  * This is free software released under the terms of the General Public License,
  * version 2, or later. It is distributed WITHOUT ANY WARRANTY; without even the
