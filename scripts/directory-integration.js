@@ -7,7 +7,7 @@ document.addEventListener( 'DOMContentLoaded', function() {
 		width = window.innerWidth,
 		height = window.innerHeight,
 		dialog = document.createElement( 'dialog' ),
-		{ __, _x, _n, _nx } = wp.i18n;	
+		{ __, _x, _n, _nx } = wp.i18n;
 
 	dialog.className = 'plugin-details-modal';
 	document.body.append( dialog ); // append dialog element to page
@@ -24,16 +24,16 @@ document.addEventListener( 'DOMContentLoaded', function() {
 				h2 = document.createElement( 'h2' ),
 				div = document.createElement( 'div' ),
 				infoFooter = document.createElement( 'div' ),
-				header = opener.closest( 'article' ).querySelector( 'h3' ).textContent,
+				header = opener.closest( 'article' ).querySelector( 'h3' ).textContent.trim(),
 				content = opener.closest( 'footer' ).dataset.content,
 				status = opener.nextElementSibling,
-				title = opener.closest( 'article' ).querySelector( 'h3' ).textContent ?
+				title = header ?
 					wp.i18n.sprintf(
-						// translators: %s: Plugin name.
-						wp.i18n.__( 'Plugin: %s' ),
-						opener.closest( 'article' ).querySelector( 'h3' ).textContent
+						// translators: %s: Plugin or Theme name.
+						wp.i18n.__( '%s Details' ),
+						header
 					) :
-					wp.i18n.__( 'Plugin details' );
+					wp.i18n.__( 'Details' );
 
 			e.preventDefault();
 			e.stopPropagation();
@@ -53,13 +53,13 @@ document.addEventListener( 'DOMContentLoaded', function() {
 			span.className = 'screen-reader-text';
 			span.textContent = wp.i18n.__( 'Close' );
 			closeButton.append( span );
-			
+
 			scrollable.id = 'plugin-information-scrollable';
 			scrollable.setHTML( content );
 			h2.textContent = header;
 			scrollable.prepend( h2 );
 			scrollable.append( div );
-			
+
 			infoFooter.id = 'plugin-information-footer';
 			infoFooter.setHTML( status.outerHTML, {
 				sanitizer: {
@@ -112,5 +112,5 @@ document.addEventListener( 'DOMContentLoaded', function() {
 	function reduceheaders( content ) {
 		return content.replaceAll( '<h5', '<h6' ).replaceAll( '</h5>', '</h6>' ).replaceAll( '<h4', '<h5' ).replaceAll( '</h4>', '</h5>' ).replaceAll( '<h3', '<h4' ).replaceAll( '</h3>', '</h4>' ).replaceAll( '<h2', '<h3' ).replaceAll( '</h2>', '</h3>' );
 	}
-	
+
 } );
